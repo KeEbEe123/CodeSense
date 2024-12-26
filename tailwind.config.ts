@@ -9,8 +9,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
+        background: "#17161c",
+        primary: "#66d9cc",
         foreground: "var(--foreground)",
+      },
+      fontFamily: {
+        koulen: ["var(--font-koulen)"],
+      },
+      boxShadow: {
+        glow: "0px 0px 50px -5px rgba(0, 0, 0, 0.3)",
+        underline: "0px 20px 50px -10px rgba(0, 0, 0, 0.3)",
       },
     },
   },
