@@ -9,6 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@nextui-org/react": "^2.6.10",
+    "@nextui-org/tooltip": "^2.2.6",
+    "@swup/parallel-plugin": "^0.4.0",
+    "@swup/preload-plugin": "^3.2.11",
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.9",
     "mongodb": "^6.12.0",
@@ -17,7 +21,8 @@
     "next-auth": "^4.24.11",
     "node-fetch": "^3.3.2",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "swup": "^4.8.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

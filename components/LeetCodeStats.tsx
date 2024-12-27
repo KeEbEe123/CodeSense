@@ -1,15 +1,30 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, ChangeEvent } from "react";
 import { useSession } from "next-auth/react"; // Hook to access the current session
 
-const LeetCodeStats = () => {
-  const { data: session } = useSession(); // Get the session data
-  const [username, setUsername] = useState("");
-  const [stats, setStats] = useState(null);
-  const [error, setError] = useState("");
+interface Stats {
+  totalSolved: number;
+  totalQuestions: number;
+  easySolved: number;
+  totalEasy: number;
+  mediumSolved: number;
+  totalMedium: number;
+  hardSolved: number;
+  totalHard: number;
+  acceptanceRate: number;
+  ranking: number;
+  contributionPoints: number;
+  reputation: number;
+}
 
-  const handleChange = (e) => {
+const LeetCodeStats: React.FC = () => {
+  const { data: session } = useSession(); // Get the session data
+  const [username, setUsername] = useState<string>("");
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [error, setError] = useState<string>("");
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
   };
 
@@ -23,7 +38,9 @@ const LeetCodeStats = () => {
     setStats(null);
 
     try {
-      const response = await fetch(`https://leetcode-stats-api.herokuapp.com/${username}`);
+      const response = await fetch(
+        `https://leetcode-stats-api.herokuapp.com/${username}`
+      );
       const data = await response.json();
 
       if (data.status === "success") {
@@ -35,7 +52,7 @@ const LeetCodeStats = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            email: session.user.email,
+            email: session?.user?.email,
             leetcodeUsername: username,
             stats: {
               totalSolved: data.totalSolved,
@@ -63,7 +80,9 @@ const LeetCodeStats = () => {
         value={username}
         onChange={handleChange}
       />
-      <button onClick={fetchStats} disabled={!session}> {/* Disable button if not logged in */}
+      <button onClick={fetchStats} disabled={!session}>
+        {" "}
+        {/* Disable button if not logged in */}
         Fetch Stats
       </button>
 
@@ -72,10 +91,18 @@ const LeetCodeStats = () => {
       {stats && !error && (
         <div>
           <h2>Stats for {username}</h2>
-          <p>Total Solved: {stats.totalSolved}/{stats.totalQuestions}</p>
-          <p>Easy Solved: {stats.easySolved}/{stats.totalEasy}</p>
-          <p>Medium Solved: {stats.mediumSolved}/{stats.totalMedium}</p>
-          <p>Hard Solved: {stats.hardSolved}/{stats.totalHard}</p>
+          <p>
+            Total Solved: {stats.totalSolved}/{stats.totalQuestions}
+          </p>
+          <p>
+            Easy Solved: {stats.easySolved}/{stats.totalEasy}
+          </p>
+          <p>
+            Medium Solved: {stats.mediumSolved}/{stats.totalMedium}
+          </p>
+          <p>
+            Hard Solved: {stats.hardSolved}/{stats.totalHard}
+          </p>
           <p>Acceptance Rate: {stats.acceptanceRate}%</p>
           <p>Ranking: {stats.ranking}</p>
           <p>Contribution Points: {stats.contributionPoints}</p>

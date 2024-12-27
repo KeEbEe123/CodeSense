@@ -1,16 +1,17 @@
 import "./globals.css";
-import { Koulen } from "next/font/google";
+import { Koulen, Poppins } from "next/font/google";
 
 import { Inter } from "next/font/google";
-import NavBar from "../components/Navbar.jsx";
+import NavBar from "@/components/Navbar";
 import { NextAuthProvider } from "./Providers";
-import LeetCodeStats from "../components/LeetCodeStats";
-import CodeForcesStats from "../components/CodeForcesStats";
-import CodeChefStats from "../components/CodeChefStats";
-import Leaderboard from "../components/Leaderboard";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+
+const poppins = Poppins({
+  weight: ["200", "400", "600"],
+  variable: "--font-poppins",
+});
 
 const koulen = Koulen({
   weight: "400",
@@ -39,16 +40,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${koulen.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${koulen.variable} ${poppins.variable} antialiased bg-background`}
       >
         <NextAuthProvider>
-          <div className="max-w-3xl mx-auto">
-            <NavBar />
-            <LeetCodeStats />
-            <CodeForcesStats />
-            <CodeChefStats />
-            <Leaderboard />
-
+          <NavBar />
+          <div id="main" className="mx-auto">
             {children}
           </div>
         </NextAuthProvider>
