@@ -3,7 +3,7 @@ import User from "@/models/user";
 import NextAuth from "next-auth/next";
 import GoogleProvider from "next-auth/providers/google";
 
-const authOptions = {
+export const authOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
@@ -11,14 +11,15 @@ const authOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account }) { 
+    async signIn({ user, account }) {
       if (account.provider === "google") {
-        const { name, email } = user;
+        const { name, email, image } = user;
         try {
           await connectMongoDB();
-          const userExists = await User.findOne({ email });
+          let existingUser = await User.findOne({ email });
 
-          if (!userExists) {
+          if (!existingUser) {
+            // If the user does not exist, create a new user
             const res = await fetch("http://localhost:3000/api/user", {
               method: "POST",
               headers: {
@@ -27,19 +28,41 @@ const authOptions = {
               body: JSON.stringify({
                 name,
                 email,
+                image,
+                onboard: false, // Set default onboarding status
               }),
             });
 
             if (res.ok) {
-              return user;
+              existingUser = await res.json(); // Fetch the created user
             }
           }
+
+          return true; // Allow the user to sign in
         } catch (error) {
-          console.log(error);
+          console.log("Sign-in error:", error);
+          return false;
         }
       }
+      return true; // Allow other providers to sign in
+    },
 
-      return user;
+    async jwt({ token, user }) {
+      // Attach `onboard` field to the JWT token
+      if (user) {
+        await connectMongoDB();
+        const dbUser = await User.findOne({ email: user.email });
+        token.onboard = dbUser?.onboard || false; // Default to `false` if not set
+      }
+      return token;
+    },
+
+    async session({ session, token }) {
+      // Attach `onboard` field to the session
+      if (token) {
+        session.user.onboard = token.onboard;
+      }
+      return session;
     },
   },
 };

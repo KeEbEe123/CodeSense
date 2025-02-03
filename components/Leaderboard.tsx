@@ -1,57 +1,233 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { Skeleton } from "@nextui-org/react";
 
-const Leaderboard = () => {
-    const [leaderboard, setLeaderboard] = useState([]);
-    const [loading, setLoading] = useState(false);
+const LeaderboardUser = () => {
+  interface User {
+    _id: string;
+    rank: number;
+    name: string;
+    email: string;
+    rollno: string;
+    department: string;
+    totalScore: number;
+    platforms: {
+      leetcode?: { score: number };
+      codechef?: { score: number };
+      codeforces?: { score: number };
+      github?: { score: number };
+    };
+  }
 
+  const [leaderboard, setLeaderboard] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [range, setRange] = useState({ start: 1, end: 10 });
+
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+
+  const { status, data: session } = useSession();
+  const userEmail = session?.user?.email;
+  const router = useRouter();
+
+  useEffect(() => {
     const fetchLeaderboard = async () => {
-        setLoading(true);
-        try {
-            const response = await fetch("/api/leaderboard");
-            const data = await response.json();
-            setLeaderboard(data);
-        } catch (error) {
-            console.error("Error fetching leaderboard:", error);
-        } finally {
-            setLoading(false);
+      try {
+        const response = await fetch("/api/leaderboard");
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          setLeaderboard(data);
+        } else {
+          console.error("Unexpected data format:", data);
         }
+      } catch (error) {
+        console.error("Error fetching leaderboard:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    useEffect(() => {
-        fetchLeaderboard();
-    }, []);
+    fetchLeaderboard();
+  }, []);
 
-    return (
-        <div>
-            <h1>Leaderboard</h1>
-            <button onClick={fetchLeaderboard} disabled={loading}>
-                {loading ? "Refreshing..." : "Refresh Leaderboard"}
-            </button>
+  const handleRowClick = (id) => {
+    router.push(`/profile/${id}`);
+  };
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Total Score</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {leaderboard.map((user, index) => (
-                        <tr key={user.email}>
-                            <td>{index + 1}</td>
-                            <td>{user.name}</td>
-                            <td>{user.email}</td>
-                            <td>{user.totalScore}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    );
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleRangeChange = (e) => {
+    const [start, end] = e.target.value.split("-").map(Number);
+    setRange({ start, end });
+  };
+
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const sortedLeaderboard = [...leaderboard].sort((a, b) => {
+    if (!sortConfig.key) return 0;
+    const getValue = (user, key) => {
+      if (
+        [
+          "leetcodeScore",
+          "codechefScore",
+          "codeforcesScore",
+          "githubScore",
+        ].includes(key)
+      ) {
+        const platformKey = key.replace("Score", ""); // Extract platform name
+        return user.platforms[platformKey]?.score || 0; // Default to 0 if undefined
+      }
+      return user[key]; // For other keys like name, email, etc.
+    };
+
+    const aValue = getValue(a, sortConfig.key);
+    const bValue = getValue(b, sortConfig.key);
+
+    if (typeof aValue === "string") {
+      return sortConfig.direction === "asc"
+        ? (aValue as string).localeCompare(bValue as string)
+        : (bValue as string).localeCompare(aValue as string);
+    }
+    return sortConfig.direction === "asc" ? aValue - bValue : bValue - aValue;
+  });
+
+  const filteredLeaderboard = sortedLeaderboard
+    .filter((user) => {
+      const query = searchQuery.toLowerCase();
+      return (
+        user.name.toLowerCase().includes(query) ||
+        user.email.toLowerCase().includes(query) ||
+        user.rollno.toLowerCase().includes(query) ||
+        user.department.toLowerCase().includes(query)
+      );
+    })
+    .slice(range.start - 1, range.end);
+
+  const getSortArrow = (key) => {
+    if (sortConfig.key === key) {
+      return sortConfig.direction === "asc" ? "↑" : "↓";
+    }
+    return "";
+  };
+
+  return (
+    <div className="p-8 min-h-screen bg-[#1c1c1c] text-blue-400 font-pop">
+      <h1 className="text-5xl font-bold text-center mb-6">Leaderboard</h1>
+      <div className="mb-6 flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
+        <input
+          type="text"
+          placeholder="Search by Name, Email, Roll No, or Department"
+          value={searchQuery}
+          onChange={handleSearch}
+          className="p-2 rounded-lg bg-[#2a2a2a] text-white border border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-auto"
+        />
+        <select
+          onChange={handleRangeChange}
+          className="p-2 rounded-lg bg-[#2a2a2a] text-white border border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-auto"
+        >
+          <option value="1-10">1-10</option>
+          <option value="11-20">11-20</option>
+          <option value="21-30">21-30</option>
+          <option value="31-50">31-50</option>
+        </select>
+      </div>
+
+      <div className="overflow-x-auto">
+        <Skeleton
+          isLoaded={!loading}
+          animated
+          className="bg-background w-full rounded-xl"
+        >
+          <table className="w-full border-collapse border border-blue-600 shadow-lg rounded-lg">
+            <thead className="bg-[#333333] text-blue-500">
+              <tr>
+                {[
+                  { label: "Rank", key: "rank" },
+                  { label: "Name", key: "name" },
+                  { label: "Email", key: "email" },
+                  { label: "Roll No", key: "rollno" },
+                  { label: "Department", key: "department" },
+                  { label: "Total Score", key: "totalScore" },
+                  { label: "LeetCode", key: "leetcodeScore" },
+                  { label: "CodeChef", key: "codechefScore" },
+                  { label: "CodeForces", key: "codeforcesScore" },
+                  { label: "GitHub", key: "githubScore" },
+                ].map(({ label, key }) => (
+                  <th
+                    key={key}
+                    className="border border-blue-600 px-4 py-2 text-left cursor-pointer"
+                    onClick={() => handleSort(key)}
+                  >
+                    {label} {getSortArrow(key)}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="bg-[#2a2a2a] text-offwhite">
+              {filteredLeaderboard.map((user) => (
+                <tr
+                  key={user._id}
+                  className={`hover:bg-[#3a3a3a] transition-all cursor-pointer ${
+                    user.rank === 1
+                      ? "bg-yellow-500/70"
+                      : user.rank === 2
+                      ? "bg-gray-400/70"
+                      : user.rank === 3
+                      ? "bg-yellow-700/70"
+                      : user.email === userEmail
+                      ? "bg-pink-600/50"
+                      : ""
+                  }`}
+                  onClick={() => handleRowClick(user._id)}
+                >
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.rank}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.name}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.email}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.rollno}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.department}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.totalScore}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.platforms.leetcode?.score || "N/A"}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.platforms.codechef?.score || "N/A"}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.platforms.codeforces?.score || "N/A"}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.platforms.github?.score || "N/A"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Skeleton>
+      </div>
+    </div>
+  );
 };
 
-export default Leaderboard;
+export default LeaderboardUser;

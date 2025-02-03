@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Logo from "@/assets/images/s.png";
 import PrimaryBtn from "./PrimaryBtn";
@@ -19,7 +19,7 @@ import {
   Avatar,
   Divider,
 } from "@nextui-org/react";
-import { on } from "events";
+import axios from "axios";
 
 const koulen = Koulen({
   weight: "400",
@@ -29,14 +29,41 @@ const koulen = Koulen({
 const Navbar: React.FC = () => {
   const { status, data: session } = useSession();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const userId = session?.user?.email;
+
+  // useEffect(() => {
+  //   const fetchUser = async () => {
+  //     try {
+  //       const response = await axios.get(`/api/getUserByEmail?email=${userId}`);
+  //       const data = response.data.user;
+
+  //       setUser(data);
+  //     } catch (error) {
+  //       console.error("Error fetching user:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   if (userId) {
+  //     fetchUser();
+  //   }
+  // }, [userId]);
+
+  // if (loading) {
+  //   return <p>Loading...</p>;
+  // }
+
   return (
     <nav
-      className={`flex items-center justify-around p-4 bg-background text-primary`}
+      className={`flex items-center justify-between p-4 bg-background text-primary`}
     >
       <Link href="/">
         <Image src={Logo} alt="Logo" width={80} height={80} className="" />
       </Link>
-      <div className="flex space-x-6">
+      <div className="hidden md:flex space-x-6">
         <TransitionLink href="/leaderboard">
           <button className="relative text-xl font-koulen text-primary hover:text-white transition-all duration-300 before:content-[''] before:absolute before:left-0 before:top-[30px] before:w-0 before:h-[3px] before:bg-pink-600 before:transition-all before:duration-300 hover:before:w-[100%]">
             Leaderboard
@@ -63,10 +90,10 @@ const Navbar: React.FC = () => {
               content="Score"
               showArrow={true}
               delay={500}
-              className="bg-pink-600/80 rounded-3xl text-white"
+              className="bg-pink-600 rounded-3xl text-white"
             >
               <p className="text-lg font-koulen cursor-default">
-                🏆 {session?.user?.score || 0}
+                {/* 🏆 {user.totalScore || 0} */}
               </p>
             </Tooltip>
             <Image
@@ -103,18 +130,30 @@ const Navbar: React.FC = () => {
                           Profile
                         </button>
                       </TransitionLink>
-                      <button
-                        className="text-2xl font-thin font-pop text-slate-400 hover:text-offwhite transition-all duration-200"
-                        onClick={onClose}
-                      >
-                        Settings
-                      </button>
-                      <button
-                        className="text-2xl font-thin font-pop text-slate-400 hover:text-offwhite transition-all duration-200"
-                        onClick={onClose}
-                      >
-                        Notifications
-                      </button>
+                      <TransitionLink href="/friends">
+                        <button
+                          className="text-2xl font-thin font-pop text-slate-400 hover:text-offwhite transition-all duration-200"
+                          onClick={onClose}
+                        >
+                          Friends
+                        </button>
+                      </TransitionLink>
+                      <TransitionLink href="/leaderboard">
+                        <button
+                          className="text-2xl font-thin font-pop text-slate-400 hover:text-offwhite transition-all duration-200"
+                          onClick={onClose}
+                        >
+                          Leaderboard
+                        </button>
+                      </TransitionLink>
+                      <TransitionLink href="courses">
+                        <button
+                          className="text-2xl font-thin font-pop text-slate-400 hover:text-offwhite transition-all duration-200"
+                          onClick={onClose}
+                        >
+                          Courses
+                        </button>
+                      </TransitionLink>
                       <button
                         className="text-2xl font-thin font-pop text-slate-400 hover:text-offwhite transition-all duration-200"
                         onClick={onClose}

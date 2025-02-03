@@ -1,11 +1,13 @@
 import React from "react";
-import LeaderboardComponent from "@/components/Leaderboard";
-function Leaderboard() {
-  return (
-    <main>
-      <LeaderboardComponent />
-    </main>
-  );
-}
+import Leaderboard from "@/components/Leaderboard";
+import { ScrollShadow } from "@heroui/scroll-shadow";
 
-export default Leaderboard;
+const page = () => {
+  return (
+    <div>
+      <Leaderboard />
+    </div>
+  );
+};
+
+export default page;

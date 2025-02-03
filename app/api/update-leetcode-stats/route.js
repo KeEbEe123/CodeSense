@@ -7,7 +7,10 @@ export async function POST(request) {
     const { email, leetcodeUsername, stats } = await request.json();
 
     if (!email || !leetcodeUsername || !stats) {
-      return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Missing required fields" },
+        { status: 400 }
+      );
     }
 
     await connectMongoDB();
@@ -20,13 +23,19 @@ export async function POST(request) {
 
     user.platforms.leetcode.username = leetcodeUsername;
     user.platforms.leetcode.score = stats.totalSolved;
-
+    user.platforms.leetcode.total = stats.totalQuestions;
 
     await user.save();
 
-    return NextResponse.json({ message: "User stats updated successfully" }, { status: 200 });
+    return NextResponse.json(
+      { message: "User stats updated successfully" },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error updating user stats:", error);
-    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
