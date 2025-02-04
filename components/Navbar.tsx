@@ -21,11 +21,6 @@ import {
 } from "@nextui-org/react";
 import axios from "axios";
 
-const koulen = Koulen({
-  weight: "400",
-  variable: "--font-koulen",
-});
-
 const Navbar: React.FC = () => {
   const { status, data: session } = useSession();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();

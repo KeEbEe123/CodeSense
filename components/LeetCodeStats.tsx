@@ -5,11 +5,6 @@ import { useSession } from "next-auth/react"; // Hook to access the current sess
 import { Koulen } from "next/font/google"; // Import the Koulen font
 import { Input, Button } from "@heroui/react"; // Import the Input component from NextUI
 import { TbCheck, TbLink, TbRefresh } from "react-icons/tb";
-// Koulen font definition
-const koulen = Koulen({
-  weight: "400",
-  variable: "--font-koulen",
-});
 
 interface Stats {
   totalSolved: number;

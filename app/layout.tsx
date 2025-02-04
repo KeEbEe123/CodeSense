@@ -16,11 +16,13 @@ import { ReactNode, useEffect } from "react";
 const poppins = Poppins({
   weight: ["200", "400", "600"],
   variable: "--font-poppins",
+  subsets: ["latin"],
 });
 
 const koulen = Koulen({
   weight: "400",
   variable: "--font-koulen",
+  subsets: ["latin"],
 });
 const geistSans = Geist({
   variable: "--font-geist-sans",
