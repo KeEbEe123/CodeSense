@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Skeleton } from "@nextui-org/react";
@@ -16,6 +16,18 @@ const Leaderboard = () => {
   const userEmail = session?.user?.email;
 
   const router = useRouter();
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      if (now.getHours() === 16 && now.getMinutes() === 21) {
+        // 4:21 PM IST (1 min after cron)
+        fetchLeaderboard();
+      }
+    }, 60000); // Check every minute
+
+    return () => clearInterval(interval);
+  }, []);
 
   const fetchLeaderboard = async () => {
     setLoading(true);
