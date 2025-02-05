@@ -90,6 +90,11 @@ const Leaderboard = () => {
 
   return (
     <div className="p-8 min-h-screen bg-[#1c1c1c] text-blue-400 font-pop">
+      {lastUpdated && (
+        <p className="text-right text-gray-500 text-sm mb-4">
+          Last Updated: {lastUpdated}
+        </p>
+      )}
       <h1 className="text-5xl font-bold text-center mb-6">Leaderboard</h1>
       <div className="mb-6 flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
         <input
@@ -120,12 +125,6 @@ const Leaderboard = () => {
           {loading ? "Refreshing..." : "Refresh Leaderboard"}
         </button>
       </div>
-
-      {lastUpdated && (
-        <p className="text-right text-gray-500 text-sm mb-4">
-          Last Updated: {lastUpdated}
-        </p>
-      )}
 
       <div className="overflow-x-auto">
         <Skeleton
