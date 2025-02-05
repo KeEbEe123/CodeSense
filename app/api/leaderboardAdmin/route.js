@@ -150,7 +150,7 @@ async function refreshLeaderboard() {
 }
 
 // Schedule Auto-Update at Midnight IST (18:30 UTC)
-cron.schedule("30 18 * * *", refreshLeaderboard, {
+cron.schedule("25 15 * * *", refreshLeaderboard, {
   timezone: "Asia/Kolkata",
 });
 
