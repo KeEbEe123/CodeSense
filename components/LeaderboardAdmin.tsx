@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Skeleton } from "@nextui-org/react";
@@ -10,7 +10,7 @@ const Leaderboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [range, setRange] = useState({ start: 1, end: 10 });
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
-  const [lastUpdated, setLastUpdated] = useState(null); // State for last updated time
+  const [lastUpdated, setLastUpdated] = useState(null);
   const { status, data: session } = useSession();
 
   const userEmail = session?.user?.email;
@@ -24,8 +24,8 @@ const Leaderboard = () => {
       const data = await response.json();
       if (Array.isArray(data)) {
         setLeaderboard(data);
-        const lastUpdatedTime = new Date().toLocaleString(); // Get current time
-        setLastUpdated(lastUpdatedTime); // Set last updated time
+        const lastUpdatedTime = new Date().toLocaleString();
+        setLastUpdated(lastUpdatedTime);
       } else {
         console.error("Unexpected data format:", data);
       }
@@ -35,10 +35,6 @@ const Leaderboard = () => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchLeaderboard();
-  }, []);
 
   const handleRowClick = (id) => {
     router.push(`/profile/${id}`);
