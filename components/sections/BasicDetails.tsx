@@ -168,6 +168,7 @@ export const BasicDetails = ({ onSuccess }: { onSuccess: () => void }) => {
             <DropdownItem key="C">C</DropdownItem>
             <DropdownItem key="D">D</DropdownItem>
             <DropdownItem key="D">E</DropdownItem>
+            <DropdownItem key="D">F</DropdownItem>
           </DropdownMenu>
         </Dropdown>
         <Input
