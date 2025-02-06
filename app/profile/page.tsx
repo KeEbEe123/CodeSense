@@ -259,14 +259,14 @@ const ProfilePage = () => {
                         </ModalBody>
                         <ModalFooter>
                           <Button
-                            color="danger"
+                            color="success"
                             variant="flat"
                             onPress={() => {
                               onClose();
                               fetchUser();
                             }}
                           >
-                            Close
+                            Save
                           </Button>
                         </ModalFooter>
                       </>
@@ -338,14 +338,14 @@ const ProfilePage = () => {
                         </ModalBody>
                         <ModalFooter>
                           <Button
-                            color="danger"
+                            color="success"
                             variant="flat"
                             onPress={() => {
                               onClose();
                               fetchUser();
                             }}
                           >
-                            Close
+                            Save
                           </Button>
                         </ModalFooter>
                       </>
@@ -404,14 +404,14 @@ const ProfilePage = () => {
                         </ModalBody>
                         <ModalFooter>
                           <Button
-                            color="danger"
+                            color="success"
                             variant="flat"
                             onPress={() => {
                               onCloseLeetcode();
                               fetchUser();
                             }} // Use the specific onClose function here
                           >
-                            Close
+                            Save
                           </Button>
                         </ModalFooter>
                       </>
@@ -445,14 +445,14 @@ const ProfilePage = () => {
                         </ModalBody>
                         <ModalFooter>
                           <Button
-                            color="danger"
+                            color="success"
                             variant="flat"
                             onPress={() => {
                               onCloseCodechef();
                               fetchUser();
                             }}
                           >
-                            Close
+                            Save
                           </Button>
                         </ModalFooter>
                       </>
@@ -486,14 +486,14 @@ const ProfilePage = () => {
                         </ModalBody>
                         <ModalFooter>
                           <Button
-                            color="danger"
+                            color="success"
                             variant="flat"
                             onPress={() => {
                               onCloseCodeforces();
                               fetchUser();
                             }}
                           >
-                            Close
+                            Save
                           </Button>
                         </ModalFooter>
                       </>
@@ -527,14 +527,14 @@ const ProfilePage = () => {
                         </ModalBody>
                         <ModalFooter>
                           <Button
-                            color="danger"
+                            color="success"
                             variant="flat"
                             onPress={() => {
                               onCloseGithub();
                               fetchUser();
                             }}
                           >
-                            Close
+                            Save
                           </Button>
                         </ModalFooter>
                       </>
