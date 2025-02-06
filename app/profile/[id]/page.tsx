@@ -111,33 +111,34 @@ const Profile = ({ params }: { params: { id: string } }) => {
             </Tab>
 
             <Tab key="internships" title="Internships">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 ">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {Array.isArray(user.internships) &&
                 user.internships.length > 0 ? (
                   user.internships.map((internship, index) => (
                     <Card
                       key={index}
-                      className="pb-2 mx-3 bg-gradient-to-bl from-gray-800 to-background w-full"
+                      className="pb-2 pr-22 bg-gradient-to-bl from-gray-800 to-background w-full"
                     >
-                      <CardBody className="font-pop text-offwhite mb-2 lg:pr-16">
-                        <h3 className="text-2xl font-semibold">
+                      <CardBody className="font-pop text-offwhite">
+                        <h3 className="text-lg sm:text-2xl font-semibold">
                           {internship.title}
                         </h3>
-                        <p>{internship.description}</p>
-                        <p className="text-sm text-gray-400">
+                        <p className="text-sm sm:text-base">
+                          {internship.description}
+                        </p>
+                        <p className="text-xs sm:text-sm text-gray-400">
                           at {internship.company}
                         </p>
-                        <p className="text-sm text-gray-400">
-                          from {internship.startDate}
-                        </p>
-                        <p className="text-sm text-gray-400">
-                          to {internship.endDate}
+                        <p className="text-xs sm:text-sm text-gray-400">
+                          from {internship.startDate} to {internship.endDate}
                         </p>
                       </CardBody>
                     </Card>
                   ))
                 ) : (
-                  <p className="text-red-500">No internships available</p>
+                  <p className="text-red-500 col-span-1 sm:col-span-2 lg:col-span-3">
+                    No internships available
+                  </p>
                 )}
               </div>
             </Tab>
@@ -148,7 +149,7 @@ const Profile = ({ params }: { params: { id: string } }) => {
                 user.certifications.length > 0 ? (
                   user.certifications.map((certification, index) => (
                     <Card
-                      className="pb-2 mx-3 bg-gradient-to-bl from-gray-800 to-background"
+                      className="pb-2 pr-14 bg-gradient-to-bl from-gray-800 to-background w-full "
                       key={index}
                     >
                       <CardBody className="text-offwhite font-pop mb-2">

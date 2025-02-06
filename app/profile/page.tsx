@@ -198,8 +198,8 @@ const ProfilePage = () => {
             </Tab>
 
             <Tab key="internships" title="Internships">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
-                <Card className="pb-2 mx-3 bg-gradient-to-bl from-gray-800 to-background w-full">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <Card className="pb-2 bg-gradient-to-bl from-gray-800 to-background w-full">
                   <CardBody className="text-offwhite font-pop">
                     <Button
                       className="text-lg sm:text-2xl font-semibold"
@@ -214,7 +214,7 @@ const ProfilePage = () => {
                   user.internships.map((internship, index) => (
                     <Card
                       key={index}
-                      className="pb-2 mx-3 bg-gradient-to-bl from-gray-800 to-background w-full"
+                      className="pb-2 pr-14 bg-gradient-to-bl from-gray-800 to-background w-full lg:pr-28"
                     >
                       <CardBody className="font-pop text-offwhite">
                         <h3 className="text-lg sm:text-2xl font-semibold">
@@ -233,7 +233,7 @@ const ProfilePage = () => {
                     </Card>
                   ))
                 ) : (
-                  <p className="text-red-500 col-span-2">
+                  <p className="text-red-500 col-span-1 sm:col-span-2 lg:col-span-3">
                     No internships available
                   </p>
                 )}

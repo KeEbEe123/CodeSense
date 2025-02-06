@@ -50,6 +50,16 @@ export const BasicDetails = ({ onSuccess }: { onSuccess: () => void }) => {
   const onSubmit = async (e: React.FormEvent<CustomFormElement>) => {
     e.preventDefault();
 
+    if (!selectedValue || selectedValue === "Select Department") {
+      setError("Please select a department.");
+      return;
+    }
+
+    if (!selectedSectionValue || selectedSectionValue === "Select Section") {
+      setError("Please select a section.");
+      return;
+    }
+
     const formData = Object.fromEntries(new FormData(e.currentTarget));
     const data = {
       ...formData,
@@ -167,8 +177,9 @@ export const BasicDetails = ({ onSuccess }: { onSuccess: () => void }) => {
             <DropdownItem key="B">B</DropdownItem>
             <DropdownItem key="C">C</DropdownItem>
             <DropdownItem key="D">D</DropdownItem>
-            <DropdownItem key="D">E</DropdownItem>
-            <DropdownItem key="D">F</DropdownItem>
+            <DropdownItem key="E">E</DropdownItem>
+            <DropdownItem key="F">F</DropdownItem>
+            <DropdownItem key="G">G</DropdownItem>
           </DropdownMenu>
         </Dropdown>
         <Input

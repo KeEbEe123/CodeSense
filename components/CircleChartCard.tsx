@@ -26,11 +26,12 @@ const formatTotal = (total: number) => {
 const colors = ["#FFA500", "#FF6347", "#4682B4", "#4d4d4d", "#FFD700"];
 
 export default function Component({ platforms }: ComponentProps) {
-  // Combine all platform data into a single chart dataset
   const chartData: ChartData[] = Object.keys(platforms).map((key) => ({
     name: key,
     value: platforms[key].score,
   }));
+
+  const totalScore = chartData.reduce((acc, curr) => acc + curr.value, 0);
 
   return (
     <Card className="pb-2 mx-3 bg-gradient-to-bl from-gray-800 to-background w-full md:w-1/2 p-5 pt-2 pl-2">
@@ -39,7 +40,7 @@ export default function Component({ platforms }: ComponentProps) {
           Platform Scores
         </h3>
       </div>
-      <div className="flex flex-col md:flex-row h-full items-center justify-center">
+      <div className="flex flex-col md:flex-row h-full items-center justify-center relative">
         <ResponsiveContainer width="100%" height={200}>
           <PieChart>
             <Tooltip
@@ -66,7 +67,7 @@ export default function Component({ platforms }: ComponentProps) {
               data={chartData}
               dataKey="value"
               nameKey="name"
-              innerRadius="68%"
+              innerRadius="58%"
               outerRadius="80%"
               strokeWidth={0}
             >
@@ -77,6 +78,24 @@ export default function Component({ platforms }: ComponentProps) {
                 />
               ))}
             </Pie>
+            <text
+              x="50%"
+              y="45%"
+              textAnchor="middle"
+              dominantBaseline="middle"
+              className="text-sm font-bold fill-white font-pop"
+            >
+              Total:
+            </text>
+            <text
+              x="50%"
+              y="55%"
+              textAnchor="middle"
+              dominantBaseline="middle"
+              className="text-xl font-bold fill-white font-pop"
+            >
+              {formatTotal(totalScore)}
+            </text>
           </PieChart>
         </ResponsiveContainer>
         <div className="flex flex-col gap-2 pl-4 mt-4 md:mt-0">

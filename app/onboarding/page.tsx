@@ -38,38 +38,38 @@ const Onboarding = () => {
   const handleBack = () => setCurrentStep((prev) => prev - 1);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-transparent text-white p-6">
-      <div className="w-full max-w-screen p-6 bg-gradient-to-bl from-gray-950 to-background rounded-xl  flex">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-transparent text-white">
+      <div className="w-full max-w-5xl p-6 bg-gradient-to-bl from-gray-950 to-background rounded-xl flex flex-col md:flex-row">
         {/* Left Pane: Steps and Progress */}
-        <div className="w-1/7 p-4 border-r border-gray-700">
-          <h1 className="text-4xl text-cyan-500 font-koulen mb-4">
+        <div className="w-full md:w-1/4 p-4 border-b md:border-b-0 md:border-r border-gray-700">
+          <h1 className="text-3xl md:text-4xl text-cyan-500 font-koulen mb-4">
             Onboarding Steps
           </h1>
           <ul className="space-y-2">
             <li
-              className={
+              className={`font-koulen ${
                 currentStep === 1
-                  ? "font-koulen text-3xl text-pink-600"
-                  : "font-koulen text-xl text-cyan-200"
-              }
+                  ? "text-2xl md:text-3xl text-pink-600"
+                  : "text-lg md:text-xl text-cyan-200"
+              }`}
             >
               1. Basic Details
             </li>
             <li
-              className={
+              className={`font-koulen ${
                 currentStep === 2
-                  ? "text-pink-600 font-koulen text-3xl"
-                  : "text-xl font-koulen text-cyan-200"
-              }
+                  ? "text-2xl md:text-3xl text-pink-600"
+                  : "text-lg md:text-xl text-cyan-200"
+              }`}
             >
               2. About Yourself
             </li>
             <li
-              className={
+              className={`font-koulen ${
                 currentStep === 3
-                  ? "text-pink-600 font-koulen text-3xl"
-                  : "text-xl text-cyan-200 font-koulen"
-              }
+                  ? "text-2xl md:text-3xl text-pink-600"
+                  : "text-lg md:text-xl text-cyan-200"
+              }`}
             >
               3. Connect Profiles
             </li>
@@ -77,25 +77,25 @@ const Onboarding = () => {
         </div>
 
         {/* Right Pane: Step Content */}
-        <div className="w-2/3 p-4">
+        <div className="w-full md:w-3/4 ">
           {/* Render Step Components */}
           {currentStep === 1 && <BasicDetails onSuccess={handleNext} />}
           {currentStep === 2 && <AboutYourself onSuccess={handleNext} />}
           {currentStep === 3 && <ConnectProfiles />}
 
           {/* Navigation Buttons */}
-          <div className="flex justify-between mt-6">
+          <div className="flex flex-col sm:flex-row justify-between mt-6 gap-4">
             <button
               onClick={handleBack}
               disabled={currentStep === 1}
-              className="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600 disabled:opacity-50"
+              className="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600 disabled:opacity-50 w-full sm:w-auto"
             >
               Back
             </button>
-            {currentStep == 3 && (
+            {currentStep === 3 && (
               <button
                 onClick={completeOnboarding}
-                className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-500"
+                className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-500 w-full sm:w-auto"
               >
                 Complete Onboarding
               </button>
