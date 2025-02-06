@@ -163,7 +163,7 @@ export async function POST() {
     // Fetch the updated leaderboard data
     const leaderboard = await User.find()
       .sort({ rank: 1 })
-      .select("name email totalScore rollno department platforms rank")
+      .select("name email totalScore rollno department section platforms rank")
       .exec();
 
     return NextResponse.json(leaderboard, { status: 200 });

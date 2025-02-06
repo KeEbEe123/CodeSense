@@ -4,7 +4,7 @@ import User from "../../../models/user";
 
 export async function POST(request) {
   try {
-    const { rollno, about, contact, linkedIn, email, department } =
+    const { rollno, about, contact, linkedIn, email, department, section } =
       await request.json();
 
     if (!email || !rollno || !contact) {

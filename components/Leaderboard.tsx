@@ -12,6 +12,7 @@ const LeaderboardUser = () => {
     email: string;
     rollno: string;
     department: string;
+    section: string;
     totalScore: number;
     platforms: {
       leetcode?: { score: number };
@@ -157,6 +158,7 @@ const LeaderboardUser = () => {
                   { label: "Email", key: "email" },
                   { label: "Roll No", key: "rollno" },
                   { label: "Department", key: "department" },
+                  { label: "Section", key: "section" },
                   { label: "Total Score", key: "totalScore" },
                   { label: "LeetCode", key: "leetcodeScore" },
                   { label: "CodeChef", key: "codechefScore" },
@@ -204,6 +206,9 @@ const LeaderboardUser = () => {
                   </td>
                   <td className="border border-blue-600 px-4 py-2">
                     {user.department}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.section}
                   </td>
                   <td className="border border-blue-600 px-4 py-2">
                     {user.totalScore}

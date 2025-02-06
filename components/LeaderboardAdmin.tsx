@@ -9,7 +9,7 @@ const Leaderboard = () => {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [range, setRange] = useState({ start: 1, end: 10 });
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+  const [sortConfig, setSortConfig] = useState([]);
   const [lastUpdated, setLastUpdated] = useState(null);
   const { status, data: session } = useSession();
 
@@ -62,23 +62,31 @@ const Leaderboard = () => {
   };
 
   const handleSort = (key) => {
-    let direction = "asc";
-    if (sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc";
-    }
-    setSortConfig({ key, direction });
+    setSortConfig((prevSortConfig) => {
+      const existingSort = prevSortConfig.find((config) => config.key === key);
+      if (existingSort) {
+        return prevSortConfig.map((config) =>
+          config.key === key
+            ? {
+                ...config,
+                direction: config.direction === "asc" ? "desc" : "asc",
+              }
+            : config
+        );
+      } else {
+        return [...prevSortConfig, { key, direction: "asc" }];
+      }
+    });
   };
 
   const sortedLeaderboard = [...leaderboard].sort((a, b) => {
-    if (!sortConfig.key) return 0;
-    const aValue = a[sortConfig.key];
-    const bValue = b[sortConfig.key];
-    if (typeof aValue === "string") {
-      return sortConfig.direction === "asc"
-        ? aValue.localeCompare(bValue)
-        : bValue.localeCompare(aValue);
+    for (const { key, direction } of sortConfig) {
+      const aValue = key.split(".").reduce((obj, keyPart) => obj[keyPart], a);
+      const bValue = key.split(".").reduce((obj, keyPart) => obj[keyPart], b);
+      if (aValue < bValue) return direction === "asc" ? -1 : 1;
+      if (aValue > bValue) return direction === "asc" ? 1 : -1;
     }
-    return sortConfig.direction === "asc" ? aValue - bValue : bValue - aValue;
+    return 0;
   });
 
   const filteredLeaderboard = sortedLeaderboard
@@ -94,8 +102,9 @@ const Leaderboard = () => {
     .slice(range.start - 1, range.end);
 
   const getSortArrow = (key) => {
-    if (sortConfig.key === key) {
-      return sortConfig.direction === "asc" ? "↑" : "↓";
+    const sortConfigItem = sortConfig.find((config) => config.key === key);
+    if (sortConfigItem) {
+      return sortConfigItem.direction === "asc" ? "↑" : "↓";
     }
     return "";
   };

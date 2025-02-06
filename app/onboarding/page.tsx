@@ -22,7 +22,7 @@ const Onboarding = () => {
       if (response.ok) {
         // Log the user out
         await signOut();
-        router.push("/");
+        router.push("/leaderboard");
       } else {
         const errorData = await response.json();
         console.error("Error completing onboarding:", errorData);

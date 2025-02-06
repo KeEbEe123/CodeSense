@@ -7,7 +7,7 @@ export async function GET() {
     await connectMongoDB();
     const leaderboard = await User.find({})
       .sort({ rank: 1 })
-      .select("name email totalScore rank platforms rollno department")
+      .select("name email totalScore rank platforms rollno department section")
       .exec();
 
     return NextResponse.json(leaderboard, { status: 200 });
