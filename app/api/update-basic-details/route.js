@@ -27,6 +27,7 @@ export async function POST(request) {
     user.linkedIn = linkedIn;
     user.Contact = contact;
     user.department = department;
+    user.section = section;
 
     await user.save();
 
