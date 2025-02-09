@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { Input } from "@heroui/react";
 import { signIn, signOut, useSession } from "next-auth/react";
@@ -11,7 +10,6 @@ import { TbBrandGoogle, TbBrandGoogleFilled } from "react-icons/tb";
 export default function SignInPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (status === "authenticated") {
