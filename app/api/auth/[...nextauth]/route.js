@@ -15,6 +15,15 @@ export const authOptions = {
     async signIn({ user, account }) {
       if (account.provider === "google") {
         const { name, email, image } = user;
+        const allowedDomains = ["mlrit.ac.in", "mlrinstitutions.ac.in"];
+        const userDomain = email.split("@")[1];
+
+        // Reject sign-in if the domain is not allowed
+        if (!allowedDomains.includes(userDomain)) {
+          console.log(`Sign-in blocked: ${email} is not from an allowed domain.`);
+          return false;
+        }
+
         try {
           await connectMongoDB();
           let existingUser = await User.findOne({ email });
@@ -30,7 +39,7 @@ export const authOptions = {
                 name,
                 email,
                 image,
-                onboard: false, // Set default onboarding status
+                onboard: false, // Default onboarding status
               }),
             });
 

@@ -21,8 +21,10 @@ export async function POST(request) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
+    // Update CodeChef username and stats
     user.platforms.codechef.username = codechefUsername;
-    user.platforms.codechef.score = stats.currentRating;
+    user.platforms.codechef.score = stats.currentRating || 0;
+    user.platforms.codechef.contributions = stats.contributions || 0; // Ensure contributions are updated
 
     await user.save();
 

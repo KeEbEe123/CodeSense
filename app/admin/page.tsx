@@ -9,7 +9,7 @@ import OpportunitiesAdmin from "@/components/OpportunityAdmin";
 import { Tab, Tabs } from "@heroui/react";
 import CoursesAdmin from "@/components/CoursesAdmin";
 
-const ADMIN_EMAILS = ["keertan.k@gmail.com", "admin2@example.com"];
+const ADMIN_EMAILS = ["keertan.k@gmail.com", "admin2@example.com", "23r21a12b3@mlrit.ac.in", "23r21a1285@mlrit.ac.in", "siddhartht4206@gmail.com"];
 
 export default function AdminPage() {
   const { data: session, status } = useSession();

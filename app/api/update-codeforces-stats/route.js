@@ -6,7 +6,7 @@ export async function POST(request) {
   try {
     const { email, codeforcesUsername, stats } = await request.json();
 
-    if (!email || !codeforcesUsername || !stats) {
+    if (!email || !codeforcesUsername) {
       return NextResponse.json(
         { message: "Missing required fields" },
         { status: 400 }
@@ -14,15 +14,19 @@ export async function POST(request) {
     }
 
     await connectMongoDB();
-
     const user = await User.findOne({ email });
 
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    user.platforms.codeforces.username = codeforcesUsername;
-    user.platforms.codeforces.score = stats.contribution;
+    const previousScore = user.platforms?.codeforces?.score || 0;
+    const newScore = stats?.contribution ?? previousScore;
+
+    user.platforms.codeforces = {
+      username: codeforcesUsername,
+      score: newScore,
+    };
 
     await user.save();
 

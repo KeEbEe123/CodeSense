@@ -7,7 +7,7 @@ import { Skeleton } from "@nextui-org/react";
 const LeaderboardUser = () => {
   interface User {
     _id: string;
-    rank: number;
+    rank?: number;
     name: string;
     email: string;
     rollno: string;
@@ -25,7 +25,7 @@ const LeaderboardUser = () => {
   const [leaderboard, setLeaderboard] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [range, setRange] = useState({ start: 1, end: 10 });
+  const [range, setRange] = useState({ start: 1, end: 50 });
 
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
 
@@ -102,6 +102,7 @@ const LeaderboardUser = () => {
     return sortConfig.direction === "asc" ? aValue - bValue : bValue - aValue;
   });
 
+  // Ensure users with no rank are at the bottom
   const filteredLeaderboard = sortedLeaderboard
     .filter((user) => {
       const query = searchQuery.toLowerCase();
@@ -112,6 +113,7 @@ const LeaderboardUser = () => {
         user.department.toLowerCase().includes(query)
       );
     })
+    .sort((a, b) => (a.rank ? 0 : 1) - (b.rank ? 0 : 1)) // Push users with no rank to the bottom
     .slice(range.start - 1, range.end);
 
   const getSortArrow = (key) => {
@@ -136,10 +138,11 @@ const LeaderboardUser = () => {
           onChange={handleRangeChange}
           className="p-2 rounded-lg bg-[#2a2a2a] text-white border border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-auto"
         >
-          <option value="1-10">1-10</option>
-          <option value="11-20">11-20</option>
-          <option value="21-30">21-30</option>
-          <option value="31-50">31-50</option>
+          {Array.from({ length: 10 }, (_, i) => (
+            <option key={i} value={`${i * 50 + 1}-${(i + 1) * 50}`}>
+              {i * 50 + 1}-{(i + 1) * 50}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -152,7 +155,7 @@ const LeaderboardUser = () => {
           <table className="w-full border-collapse border border-blue-600 shadow-lg rounded-lg">
             <thead className="bg-[#333333] text-blue-500">
               <tr>
-                {[
+                {[ 
                   { label: "Rank", key: "rank" },
                   { label: "Name", key: "name" },
                   { label: "Email", key: "email" },
@@ -176,58 +179,47 @@ const LeaderboardUser = () => {
               </tr>
             </thead>
             <tbody className="bg-[#2a2a2a] text-offwhite">
-              {filteredLeaderboard.map((user) => (
-                <tr
-                  key={user._id}
-                  className={`hover:bg-[#3a3a3a] transition-all cursor-pointer ${
-                    user.rank === 1
-                      ? "bg-yellow-500/70"
-                      : user.rank === 2
-                      ? "bg-gray-400/70"
-                      : user.rank === 3
-                      ? "bg-yellow-700/70"
-                      : user.email === userEmail
-                      ? "bg-pink-600/50"
-                      : ""
-                  }`}
-                  onClick={() => handleRowClick(user._id)}
-                >
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.rank}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.name}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.email}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.rollno}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.department}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.section}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.totalScore}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.platforms.leetcode?.score || "N/A"}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.platforms.codechef?.score || "N/A"}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.platforms.codeforces?.score || "N/A"}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.platforms.github?.score || "N/A"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+  {filteredLeaderboard.map((user) => (
+    <tr
+      key={user._id}
+      className={`hover:bg-[#3a3a3a] transition-all cursor-pointer ${
+        user.rank === 1
+          ? "bg-yellow-500/70"
+          : user.rank === 2
+          ? "bg-gray-400/70"
+          : user.rank === 3
+          ? "bg-yellow-700/70"
+          : user.email === userEmail
+          ? "bg-pink-600/50"
+          : ""
+      }`}
+      onClick={() => handleRowClick(user._id)}
+    >
+      <td className="border border-blue-600 px-4 py-2">{user.rank || "-"}</td>
+      <td className="border border-blue-600 px-4 py-2">{user.name}</td>
+      <td className="border border-blue-600 px-4 py-2">{user.email}</td>
+      <td className="border border-blue-600 px-4 py-2">{user.rollno}</td>
+      <td className="border border-blue-600 px-4 py-2">{user.department}</td>
+      <td className="border border-blue-600 px-4 py-2">{user.section}</td>
+      <td className="border border-blue-600 px-4 py-2">{user.totalScore}</td>
+      
+      {/* ✅ FIX: Render platform scores correctly */}
+      <td className="border border-blue-600 px-4 py-2">
+        {user.platforms?.leetcode?.score ?? "-"}
+      </td>
+      <td className="border border-blue-600 px-4 py-2">
+        {user.platforms?.codechef?.score ?? "-"}
+      </td>
+      <td className="border border-blue-600 px-4 py-2">
+        {user.platforms?.codeforces?.score ?? "-"}
+      </td>
+      <td className="border border-blue-600 px-4 py-2">
+        {user.platforms?.github?.score ?? "-"}
+      </td>
+    </tr>
+  ))}
+</tbody>
+
           </table>
         </Skeleton>
       </div>

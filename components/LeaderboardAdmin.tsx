@@ -8,23 +8,21 @@ const Leaderboard = () => {
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [range, setRange] = useState({ start: 1, end: 10 });
+  const [range, setRange] = useState({ start: 1, end: 100 }); // Updated range spans
   const [sortConfig, setSortConfig] = useState([]);
   const [lastUpdated, setLastUpdated] = useState(null);
   const { status, data: session } = useSession();
 
   const userEmail = session?.user?.email;
-
   const router = useRouter();
 
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
       if (now.getHours() === 16 && now.getMinutes() === 21) {
-        // 4:21 PM IST (1 min after cron)
         fetchLeaderboard();
       }
-    }, 60000); // Check every minute
+    }, 60000);
 
     return () => clearInterval(interval);
   }, []);
@@ -36,8 +34,7 @@ const Leaderboard = () => {
       const data = await response.json();
       if (Array.isArray(data)) {
         setLeaderboard(data);
-        const lastUpdatedTime = new Date().toLocaleString();
-        setLastUpdated(lastUpdatedTime);
+        setLastUpdated(new Date().toLocaleString());
       } else {
         console.error("Unexpected data format:", data);
       }
@@ -79,10 +76,13 @@ const Leaderboard = () => {
     });
   };
 
+  // Sorting users: Move users with no rank to the bottom
   const sortedLeaderboard = [...leaderboard].sort((a, b) => {
+    if (!a.rank && b.rank) return 1; // No-rank users go to bottom
+    if (a.rank && !b.rank) return -1;
     for (const { key, direction } of sortConfig) {
-      const aValue = key.split(".").reduce((obj, keyPart) => obj[keyPart], a);
-      const bValue = key.split(".").reduce((obj, keyPart) => obj[keyPart], b);
+      const aValue = key.split(".").reduce((obj, keyPart) => obj[keyPart], a) ?? 0;
+      const bValue = key.split(".").reduce((obj, keyPart) => obj[keyPart], b) ?? 0;
       if (aValue < bValue) return direction === "asc" ? -1 : 1;
       if (aValue > bValue) return direction === "asc" ? 1 : -1;
     }
@@ -103,10 +103,7 @@ const Leaderboard = () => {
 
   const getSortArrow = (key) => {
     const sortConfigItem = sortConfig.find((config) => config.key === key);
-    if (sortConfigItem) {
-      return sortConfigItem.direction === "asc" ? "↑" : "↓";
-    }
-    return "";
+    return sortConfigItem ? (sortConfigItem.direction === "asc" ? "↑" : "↓") : "";
   };
 
   return (
@@ -129,10 +126,10 @@ const Leaderboard = () => {
           onChange={handleRangeChange}
           className="p-2 rounded-lg bg-[#2a2a2a] text-white border border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-auto"
         >
-          <option value="1-10">1-10</option>
-          <option value="11-20">11-20</option>
-          <option value="21-30">21-30</option>
-          <option value="31-50">31-50</option>
+          <option value="1-100">1-100</option>
+          <option value="101-200">101-200</option>
+          <option value="201-300">201-300</option>
+          <option value="301-400">301-400</option>
         </select>
         <button
           onClick={fetchLeaderboard}
@@ -148,11 +145,7 @@ const Leaderboard = () => {
       </div>
 
       <div className="overflow-x-auto">
-        <Skeleton
-          isLoaded={!loading}
-          animated
-          className="bg-background w-full rounded-xl"
-        >
+        <Skeleton isLoaded={!loading} animated className="bg-background w-full rounded-xl">
           <table className="w-full border-collapse border border-blue-600 shadow-lg rounded-lg">
             <thead className="bg-[#333333] text-blue-500">
               <tr>
@@ -181,46 +174,18 @@ const Leaderboard = () => {
             </thead>
             <tbody className="bg-[#2a2a2a] text-blue-400">
               {filteredLeaderboard.map((user) => (
-                <tr
-                  key={user._id}
-                  className={`hover:bg-[#3a3a3a] transition-all cursor-pointer ${
-                    user.email === userEmail ? "bg-pink-600/50" : ""
-                  }`}
-                  onClick={() => handleRowClick(user._id)}
-                >
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.rank}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.name}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.email}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.rollno}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.department}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.section}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.totalScore}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.platforms.leetcode?.score || "N/A"}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.platforms.codechef?.score || "N/A"}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.platforms.codeforces?.score || "N/A"}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.platforms.github?.score || "N/A"}
-                  </td>
+                <tr key={user._id} className="hover:bg-[#3a3a3a] transition-all cursor-pointer">
+                  <td className="border border-blue-600 px-4 py-2">{user.rank ?? 0}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.name}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.email}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.rollno}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.department}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.section}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.totalScore ?? 0}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.platforms?.leetcode?.score ?? 0}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.platforms?.codechef?.score ?? 0}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.platforms?.codeforces?.score ?? 0}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.platforms?.github?.score ?? 0}</td>
                 </tr>
               ))}
             </tbody>
