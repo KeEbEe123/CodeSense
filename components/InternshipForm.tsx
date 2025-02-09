@@ -65,7 +65,6 @@ const InternshipForm: React.FC<InternshipFormProps> = ({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             isRequired
-            variant="underlined"
             classNames={{
               label: "text-white",
               input: "text-white placeholder-white",
@@ -80,7 +79,6 @@ const InternshipForm: React.FC<InternshipFormProps> = ({
             value={company}
             onChange={(e) => setCompany(e.target.value)}
             isRequired
-            variant="underlined"
             classNames={{
               label: "text-white",
               input: "text-white placeholder-white",
@@ -94,13 +92,11 @@ const InternshipForm: React.FC<InternshipFormProps> = ({
               label="Internship start"
               selectorButtonPlacement="start"
               onChange={(date) => setStartDate(date?.toString() || "")}
-              variant="underlined"
             />
             <DatePicker
               label="Internship end"
               selectorButtonPlacement="end"
               onChange={(date) => setEndDate(date?.toString() || "")}
-              variant="underlined"
             />
           </div>
         </div>

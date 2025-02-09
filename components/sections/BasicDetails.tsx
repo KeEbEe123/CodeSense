@@ -3,60 +3,56 @@
 import React, { useState } from "react";
 import { Form, Input, Button } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
-import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-} from "@heroui/react";
+import { Select, SelectItem } from "@heroui/react";
 
 export const BasicDetails = ({ onSuccess }: { onSuccess: () => void }) => {
-  const { data: session } = useSession(); // Fetch the session
+  const { data: session } = useSession();
   const [submitted, setSubmitted] = useState<Record<
     string,
     FormDataEntryValue
   > | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [selectedKeys, setSelectedKeys] = React.useState(
-    new Set(["Select Department"])
-  );
-  const [selectedSection, setSelectedSection] = React.useState(
-    new Set(["Select Section"])
-  );
+  const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [selectedSection, setSelectedSection] = useState("");
+  const [department, setDepartment] = useState<string | null>(null); // ✅ CHANGED
+  const [section, setSection] = useState<string | null>(null);
 
-  const selectedValue = React.useMemo(
-    () => Array.from(selectedKeys).join(", ").replace(/_/g, ""),
-    [selectedKeys]
-  );
+  const departments = [
+    { key: "CSE", label: "CSE" },
+    { key: "CSD", label: "CSD" },
+    { key: "CSM", label: "CSM" },
+    { key: "CSIT", label: "CSIT" },
+    { key: "CSE-CyberSecurity", label: "CSE-CyberSecurity" },
+    { key: "IT", label: "IT" },
+    { key: "ECE", label: "ECE" },
+    { key: "EEE", label: "EEE" },
+    { key: "AERO", label: "AERO" },
+    { key: "MECH", label: "MECH" },
+  ];
 
-  const selectedSectionValue = React.useMemo(
-    () => Array.from(selectedSection).join(", ").replace(/_/g, ""),
-    [selectedSection]
-  );
+  const sections = [
+    { key: "A", label: "A" },
+    { key: "B", label: "B" },
+    { key: "C", label: "C" },
+    { key: "D", label: "D" },
+    { key: "E", label: "E" },
+    { key: "F", label: "F" },
+    { key: "G", label: "G" },
+  ];
 
-  interface FormElements extends HTMLFormControlsCollection {
-    rollno: HTMLInputElement;
-    about: HTMLInputElement;
-    contact: HTMLInputElement;
-    linkedIn: HTMLInputElement;
-    section: HTMLInputElement;
-  }
-
-  interface CustomFormElement extends HTMLFormElement {
-    readonly elements: FormElements;
-  }
-
-  const onSubmit = async (e: React.FormEvent<CustomFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!selectedValue || selectedValue === "Select Department") {
-      setError("Please select a department.");
+    if (!department) {
+      // ✅ CHANGED
+      setError("Please select a department."); // ✅ CHANGED
       return;
     }
 
-    if (!selectedSectionValue || selectedSectionValue === "Select Section") {
-      setError("Please select a section.");
+    if (!section) {
+      // ✅ CHANGED
+      setError("Please select a section."); // ✅ CHANGED
       return;
     }
 
@@ -64,11 +60,12 @@ export const BasicDetails = ({ onSuccess }: { onSuccess: () => void }) => {
     const data = {
       ...formData,
       email: session?.user?.email, // Include email from session
+      department,
+      section,
     };
 
-    console.log("Payload being sent:", data); // Debugging
+    console.log("Payload being sent:", data);
     setSubmitted(data);
-
     setError(null);
     setSuccess(null);
 
@@ -94,7 +91,7 @@ export const BasicDetails = ({ onSuccess }: { onSuccess: () => void }) => {
   };
 
   return (
-    <div className="p-6 bg-inherit text-cyan-400 font-pop rounded-lg shadow-lg max-w-lg mx-auto">
+    <div className="p-6 bg-inherit font-pop rounded-lg max-w-lg mx-auto">
       <Form
         className="w-full space-y-4"
         validationBehavior="native"
@@ -102,119 +99,92 @@ export const BasicDetails = ({ onSuccess }: { onSuccess: () => void }) => {
       >
         <Input
           isRequired
+          validate={(value) => {
+            if (value.length < 10) {
+              return "Please enter your complete roll number";
+            }
+          }}
           errorMessage="Please enter a valid roll number"
           label="Roll Number"
           labelPlacement="outside"
           name="rollno"
           placeholder="Enter your roll number"
           type="text"
-          className="border-gray-300 rounded-md px-4 py-2 w-full"
-        />
-        <Dropdown>
-          <DropdownTrigger className="border-gray-300 rounded-md px-4 py-2 w-full">
-            <Input
-              label="Department"
-              labelPlacement="outside"
-              name="department"
-              placeholder="Department"
-              value={selectedValue || "Select Department"}
-              isRequired
-            />
-          </DropdownTrigger>
-          <DropdownMenu
-            disallowEmptySelection
-            aria-label="Department selection"
-            selectedKeys={selectedKeys}
-            selectionMode="single"
-            variant="bordered"
-            onSelectionChange={(keys) => {
-              setSelectedKeys(keys);
-            }}
-          >
-            <DropdownItem key="CSE">CSE</DropdownItem>
-            <DropdownItem key="CSD">CSD</DropdownItem>
-            <DropdownItem key="CSM">CSM</DropdownItem>
-            <DropdownItem key="CSIT">CSIT</DropdownItem>
-            <DropdownItem key="CSE-CyberSecurity">
-              CSE-CyberSecurity
-            </DropdownItem>
-            <DropdownItem key="IT">IT</DropdownItem>
-            <DropdownItem key="ECE">ECE</DropdownItem>
-            <DropdownItem key="EEE">EEE</DropdownItem>
-            <DropdownItem key="AERO">AERO</DropdownItem>
-            <DropdownItem key="MECH">MECH</DropdownItem>
-          </DropdownMenu>
-        </Dropdown>
-        <Input
-          type="hidden"
-          name="department"
-          value={selectedValue}
-          isRequired
+          classNames={{
+            label: "text-primary",
+            input: "text-white placeholder-white",
+          }}
         />
 
-        <Dropdown>
-          <DropdownTrigger className="border-gray-300 rounded-md px-4 py-2 w-full">
-            <Input
-              label="Section"
-              labelPlacement="outside"
-              name="section"
-              placeholder="Section"
-              value={selectedSectionValue || "Select Section"}
-              isRequired
-            />
-          </DropdownTrigger>
-          <DropdownMenu
-            disallowEmptySelection
-            aria-label="Section selection"
-            selectedKeys={selectedSection}
-            selectionMode="single"
-            variant="bordered"
-            onSelectionChange={(keys) => {
-              setSelectedSection(keys);
-            }}
+        <div className="flex w-full space-x-4">
+          <Select
+            label="Department"
+            placeholder="Select Department"
+            labelPlacement="outside"
+            selectedKey={selectedDepartment}
+            onSelectionChange={(keys) =>
+              setDepartment(Array.from(keys)[0] as string)
+            } // ✅ CHANGED
+            isRequired
           >
-            <DropdownItem key="A">A</DropdownItem>
-            <DropdownItem key="B">B</DropdownItem>
-            <DropdownItem key="C">C</DropdownItem>
-            <DropdownItem key="D">D</DropdownItem>
-            <DropdownItem key="E">E</DropdownItem>
-            <DropdownItem key="F">F</DropdownItem>
-            <DropdownItem key="G">G</DropdownItem>
-          </DropdownMenu>
-        </Dropdown>
-        <Input
-          type="hidden"
-          name="section"
-          value={selectedSectionValue}
-          isRequired
-        />
+            {departments.map((dept) => (
+              <SelectItem key={dept.key}>{dept.label}</SelectItem>
+            ))}
+          </Select>
 
-        <Input
-          label="About"
-          labelPlacement="outside"
-          name="about"
-          placeholder="Write a short description about yourself"
-          type="text"
-          className="border-gray-300 rounded-md px-4 py-2 w-full"
-        />
-        <Input
-          isRequired
-          errorMessage="Please enter a valid contact number"
-          label="Contact"
-          labelPlacement="outside"
-          name="contact"
-          placeholder="Enter your contact number"
-          type="tel"
-          className="border-gray-300 rounded-md px-4 py-2 w-full"
-        />
-        <Input
-          label="LinkedIn"
-          labelPlacement="outside"
-          name="linkedIn"
-          placeholder="Enter your LinkedIn profile URL"
-          type="url"
-          className="border-gray-300 rounded-md px-4 py-2 w-full"
-        />
+          <Select
+            label="Section"
+            labelPlacement="outside"
+            placeholder="Select Section"
+            selectedKey={selectedSection}
+            onSelectionChange={(keys) =>
+              setSection(Array.from(keys)[0] as string)
+            } // ✅ CHANGED
+            isRequired
+          >
+            {sections.map((sec) => (
+              <SelectItem key={sec.key}>{sec.label}</SelectItem>
+            ))}
+          </Select>
+        </div>
+        <div className="mt-4 w-full">
+          <Input
+            label="About"
+            labelPlacement="outside"
+            name="about"
+            placeholder="Write a short description about yourself"
+            type="text"
+          />
+        </div>
+        <div className="mt-4 w-full">
+          <Input
+            isRequired
+            errorMessage="Please enter a valid contact number"
+            label="Contact"
+            labelPlacement="outside"
+            name="contact"
+            placeholder="Enter your contact number"
+            type="tel"
+            classNames={{
+              label: "text-black",
+              input: "text-white placeholder-white",
+            }}
+          />
+        </div>
+        <div className="mt-4 w-full">
+          <Input
+            label="LinkedIn"
+            labelPlacement="outside"
+            name="linkedIn"
+            placeholder="eg: https://www.linkedin.com/in/keertan-kuppili-b652b2290/"
+            type="url"
+            isRequired
+            classNames={{
+              label: "text-primary",
+              input: "text-white placeholder-white",
+            }}
+          />
+        </div>
         <Button
           type="submit"
           variant="bordered"

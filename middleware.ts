@@ -8,13 +8,19 @@ export async function middleware(req: NextRequest) {
   const url = req.nextUrl.clone();
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
+  // If user is already logged in and is on the sign-in page, redirect to home
+
   // Check if the user is logged in
   if (!token) {
-    url.pathname = "/api/auth/signin"; // Redirect to login if not authenticated
+    url.pathname = "/auth/signin"; // Redirect to login if not authenticated
     return NextResponse.redirect(url);
   }
 
   // Check if the user is onboarded
+  if (token.onboard && url.pathname === "/onboarding") {
+    url.pathname = "/";
+    return NextResponse.redirect(url);
+  }
   if (!token.onboard && url.pathname !== "/onboarding") {
     url.pathname = "/onboarding";
     return NextResponse.redirect(url);

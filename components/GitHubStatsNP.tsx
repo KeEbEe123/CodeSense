@@ -7,7 +7,7 @@ import { TbCheck, TbLink, TbRefresh } from "react-icons/tb";
 import { Octokit } from "octokit";
 import { Button } from "@heroui/react";
 
-const GitHubStats: React.FC = ({ onProfileLinked }) => {
+const GitHubStats: React.FC = () => {
   const { data: session } = useSession();
   const [username, setUsername] = useState<string>("");
   const [stats, setStats] = useState<{ commits: number } | null>(null);
@@ -74,13 +74,12 @@ const GitHubStats: React.FC = ({ onProfileLinked }) => {
               commitError
             );
             setIcon(<TbLink className="text-3xl text-white" />);
-            onProfileLinked(false);
           }
         })
       );
 
       setStats({ commits: totalCommits });
-      onProfileLinked(true);
+
       setIcon(<TbCheck className="text-3xl text-green-600" />);
 
       // Send fetched stats to MongoDB via API
@@ -101,7 +100,6 @@ const GitHubStats: React.FC = ({ onProfileLinked }) => {
     } catch (err) {
       console.error("Fetch Error:", err);
       setError("Error fetching GitHub stats.");
-      onProfileLinked(false);
     }
   };
   const resetInput = () => {

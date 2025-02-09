@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react"; // Hook to access the current sess
 import { Input, Button } from "@heroui/react";
 import { TbCheck, TbLink, TbRefresh } from "react-icons/tb";
 
-const CodeForcesStats = () => {
+const CodeForcesStats = ({ onProfileLinked }) => {
   const { data: session } = useSession(); // Get the session data
   const [username, setUsername] = useState("");
   const [stats, setStats] = useState(null);
@@ -34,6 +34,7 @@ const CodeForcesStats = () => {
 
       if (data.status === "OK") {
         setStats(data.result[0]);
+        onProfileLinked(true);
         setIcon(<TbCheck className="text-3xl text-green-600" />);
 
         const updateResponse = await fetch("/api/update-codeforces-stats", {
@@ -77,7 +78,6 @@ const CodeForcesStats = () => {
           label="Enter CodeForces Username"
           value={username}
           onChange={handleChange}
-          variant="underlined"
           classNames={{
             label: "text-white",
             input: "text-white placeholder-white",

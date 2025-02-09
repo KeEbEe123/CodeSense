@@ -60,20 +60,20 @@ const Navbar: React.FC = () => {
       </Link>
       <div className="hidden md:flex space-x-6">
         <TransitionLink href="/leaderboard">
-          <button className="relative text-xl font-koulen text-primary hover:text-white transition-all duration-300 before:content-[''] before:absolute before:left-0 before:top-[30px] before:w-0 before:h-[3px] before:bg-pink-600 before:transition-all before:duration-300 hover:before:w-[100%]">
+          <button className="relative text-xl font-koulen text-primary hover:text-offwhite transition-all duration-300 before:content-[''] before:absolute before:left-0 before:top-[30px] before:w-0 before:h-[3px] before:bg-pink-600 before:transition-all before:duration-300 hover:before:w-[100%]">
             Leaderboard
           </button>
         </TransitionLink>
 
         <TransitionLink href="/courses">
-          <button className="relative text-xl font-koulen text-primary hover:text-white transition-all duration-300 before:content-[''] before:absolute before:left-0 before:top-[30px] before:w-0 before:h-[3px] before:bg-pink-600 before:transition-all before:duration-300 hover:before:w-[100%]">
+          <button className="relative text-xl font-koulen text-primary hover:text-offwhite transition-all duration-300 before:content-[''] before:absolute before:left-0 before:top-[30px] before:w-0 before:h-[3px] before:bg-pink-600 before:transition-all before:duration-300 hover:before:w-[100%]">
             Courses
           </button>
         </TransitionLink>
 
-        <TransitionLink href="/competitions">
-          <button className="relative text-xl font-koulen text-primary hover:text-white transition-all duration-300 before:content-[''] before:absolute before:left-0 before:top-[30px] before:w-0 before:h-[3px] before:bg-pink-600 before:transition-all before:duration-300 hover:before:w-[100%]">
-            Competitions
+        <TransitionLink href="/opportunities">
+          <button className="relative text-xl font-koulen text-primary hover:text-offwhite transition-all duration-300 before:content-[''] before:absolute before:left-0 before:top-[30px] before:w-0 before:h-[3px] before:bg-pink-600 before:transition-all before:duration-300 hover:before:w-[100%]">
+            Opportunities
           </button>
         </TransitionLink>
       </div>
@@ -141,6 +141,14 @@ const Navbar: React.FC = () => {
                           Leaderboard
                         </button>
                       </TransitionLink>
+                      <TransitionLink href="opportunities">
+                        <button
+                          className="text-2xl font-thin font-pop text-slate-400 hover:text-offwhite transition-all duration-200"
+                          onClick={onClose}
+                        >
+                          Opportunities
+                        </button>
+                      </TransitionLink>
                       <TransitionLink href="courses">
                         <button
                           className="text-2xl font-thin font-pop text-slate-400 hover:text-offwhite transition-all duration-200"
@@ -149,12 +157,14 @@ const Navbar: React.FC = () => {
                           Courses
                         </button>
                       </TransitionLink>
-                      <button
-                        className="text-2xl font-thin font-pop text-slate-400 hover:text-offwhite transition-all duration-200"
-                        onClick={onClose}
-                      >
-                        Contact Us
-                      </button>
+                      <TransitionLink href="/contact">
+                        <button
+                          className="text-2xl font-thin font-pop text-slate-400 hover:text-offwhite transition-all duration-200"
+                          onClick={onClose}
+                        >
+                          Contact Us
+                        </button>
+                      </TransitionLink>
                       <TransitionLink href="/">
                         <button
                           className="text-2xl font-bold mt-4 font-pop text-slate-400 hover:text-pink-600 transition-all duration-200"
@@ -164,14 +174,6 @@ const Navbar: React.FC = () => {
                         </button>
                       </TransitionLink>
                     </DrawerBody>
-                    <DrawerFooter>
-                      <button color="danger" onClick={onClose}>
-                        Close
-                      </button>
-                      <button color="primary" onClick={onClose}>
-                        Action
-                      </button>
-                    </DrawerFooter>
                   </>
                 )}
               </DrawerContent>

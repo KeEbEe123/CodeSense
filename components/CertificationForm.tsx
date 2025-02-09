@@ -54,10 +54,10 @@ const CertificationForm: React.FC<CertificationFormProps> = ({
   };
 
   return (
-    <div className="bg-transparent bg-gradient-to-bl from-gray-800 to-background p-4 rounded-xl font-pop">
+    <div className="bg-transparent bg-gradient-to-bl from-gray-800 to-background p-4 rounded-xl font-pop space-y-4">
       <div>
         {/* <h2 className="text-xl font-semibold mb-4">Add Certification</h2> */}
-        <form onSubmit={handleAddCertification} className="w-full">
+        <form onSubmit={handleAddCertification} className="space-y-4">
           <div className="py-2 text-white">
             {/* <label className="block text-sm font-medium">Title</label> */}
             <Input

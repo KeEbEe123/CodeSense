@@ -10,9 +10,16 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { HeroUIProvider, Spinner } from "@heroui/react";
-import { usePathname } from "next/navigation";
-import { useLoadingStore } from "@/app/store/loadingStore";
-import { ReactNode, useEffect } from "react";
+import { Toaster } from "react-hot-toast";
+import { ReactNode } from "react";
+import "@mantine/core/styles.css";
+
+import {
+  ColorSchemeScript,
+  MantineProvider,
+  mantineHtmlProps,
+} from "@mantine/core";
+
 const poppins = Poppins({
   weight: ["200", "400", "600"],
   variable: "--font-poppins",
@@ -42,16 +49,19 @@ const inter = Inter({ subsets: ["latin"] });
 // };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
-  const { isLoading, setLoading } = useLoadingStore();
-  useEffect(() => {
-    setLoading(true);
-    const timeout = setTimeout(() => setLoading(false), 500); // Simulate loading time
+  // const pathname = usePathname();
+  // const { isLoading, setLoading } = useLoadingStore();
+  // useEffect(() => {
+  //   setLoading(true);
+  //   const timeout = setTimeout(() => setLoading(false), 500); // Simulate loading time
 
-    return () => clearTimeout(timeout);
-  }, [pathname]);
+  //   return () => clearTimeout(timeout);
+  // }, [pathname]);
   return (
-    <html lang="en" className="bg-background">
+    <html lang="en" className="bg-background" {...mantineHtmlProps}>
+      <head>
+        <ColorSchemeScript />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${koulen.variable} ${poppins.variable} antialiased bg-background`}
       >
@@ -60,14 +70,17 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <Spinner size="lg" />
           </div>
         )} */}
-        <HeroUIProvider>
-          <NextAuthProvider>
-            <Navbar />
-            <div id="main" className="mx-auto">
-              {children}
-            </div>
-          </NextAuthProvider>
-        </HeroUIProvider>
+        <MantineProvider defaultColorScheme="dark">
+          <HeroUIProvider>
+            <NextAuthProvider>
+              <Navbar />
+              <div id="main" className="mx-auto dark">
+                <Toaster position="top-center" />
+                {children}
+              </div>
+            </NextAuthProvider>
+          </HeroUIProvider>
+        </MantineProvider>
       </body>
     </html>
   );

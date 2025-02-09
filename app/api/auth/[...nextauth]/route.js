@@ -10,6 +10,7 @@ export const authOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
+
   callbacks: {
     async signIn({ user, account }) {
       if (account.provider === "google") {

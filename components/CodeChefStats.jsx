@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { Input, Button } from "@heroui/react";
 import { TbCheck, TbLink, TbRefresh } from "react-icons/tb";
 
-const CodeChefStats = () => {
+const CodeChefStats = ({ onProfileLinked }) => {
   const { data: session } = useSession(); // Get the session data
   const [username, setUsername] = useState("");
   const [stats, setStats] = useState(null);
@@ -34,6 +34,7 @@ const CodeChefStats = () => {
 
       if (data.success) {
         setStats(data);
+        onProfileLinked(true);
         setIcon(<TbCheck className="text-3xl text-green-600" />);
 
         const updateResponse = await fetch("/api/update-codechef-stats", {
@@ -79,7 +80,6 @@ const CodeChefStats = () => {
           label="Enter CodeChef Username"
           value={username}
           onChange={handleChange}
-          variant="underlined"
           classNames={{
             label: "text-white",
             input: "text-white placeholder-white",

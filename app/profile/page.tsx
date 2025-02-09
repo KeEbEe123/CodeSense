@@ -26,10 +26,10 @@ import {
   Link,
 } from "@heroui/react";
 import { TransitionLink } from "@/components/TransitionLink";
-import LeetCodeStats from "@/components/LeetCodeStats";
-import CodeChefStats from "@/components/CodeChefStats";
-import CodeForcesStats from "@/components/CodeForcesStats";
-import GitHubStats from "@/components/GitHubStats";
+import LeetCodeStatsNP from "@/components/LeetCodeStatsNP";
+import CodeChefStatsNP from "@/components/CodeChefStatsNP";
+import CodeForcesStatsNP from "@/components/CodeForcesStatsNP";
+import GitHubStatsNP from "@/components/GitHubStatsNP";
 import { Skeleton } from "@nextui-org/react";
 
 const ProfilePage = () => {
@@ -244,6 +244,8 @@ const ProfilePage = () => {
                   className="bg-gradient-to-bl from-gray-800 to-background"
                   backdrop="blur"
                   hideCloseButton
+                  isKeyboardDismissDisabled={true}
+                  isDismissable={false}
                 >
                   <ModalContent>
                     {(onClose) => (
@@ -323,6 +325,8 @@ const ProfilePage = () => {
                   className="bg-gradient-to-bl from-gray-800 to-background"
                   backdrop="blur"
                   hideCloseButton
+                  isKeyboardDismissDisabled={true}
+                  isDismissable={false}
                 >
                   <ModalContent>
                     {(onClose) => (
@@ -393,6 +397,8 @@ const ProfilePage = () => {
                     className="bg-gradient-to-bl from-gray-800 to-background"
                     backdrop="blur"
                     hideCloseButton
+                    isKeyboardDismissDisabled={true}
+                    isDismissable={false}
                   >
                     <ModalContent>
                       <>
@@ -400,7 +406,7 @@ const ProfilePage = () => {
                           Change Leetcode Username
                         </ModalHeader>
                         <ModalBody>
-                          <LeetCodeStats />
+                          <LeetCodeStatsNP />
                         </ModalBody>
                         <ModalFooter>
                           <Button
@@ -434,6 +440,8 @@ const ProfilePage = () => {
                     className="bg-gradient-to-bl from-gray-800 to-background"
                     backdrop="blur"
                     hideCloseButton
+                    isKeyboardDismissDisabled={true}
+                    isDismissable={false}
                   >
                     <ModalContent>
                       <>
@@ -441,7 +449,7 @@ const ProfilePage = () => {
                           Change Codechef Username
                         </ModalHeader>
                         <ModalBody>
-                          <CodeChefStats />
+                          <CodeChefStatsNP />
                         </ModalBody>
                         <ModalFooter>
                           <Button
@@ -475,6 +483,8 @@ const ProfilePage = () => {
                     className="bg-gradient-to-bl from-gray-800 to-background"
                     backdrop="blur"
                     hideCloseButton
+                    isKeyboardDismissDisabled={true}
+                    isDismissable={false}
                   >
                     <ModalContent>
                       <>
@@ -482,7 +492,7 @@ const ProfilePage = () => {
                           Change Codeforces Username
                         </ModalHeader>
                         <ModalBody>
-                          <CodeForcesStats />
+                          <CodeForcesStatsNP />
                         </ModalBody>
                         <ModalFooter>
                           <Button
@@ -516,6 +526,8 @@ const ProfilePage = () => {
                     className="bg-gradient-to-bl from-gray-800 to-background"
                     backdrop="blur"
                     hideCloseButton
+                    isKeyboardDismissDisabled={true}
+                    isDismissable={false}
                   >
                     <ModalContent>
                       <>
@@ -523,7 +535,7 @@ const ProfilePage = () => {
                           Change GitHub Username
                         </ModalHeader>
                         <ModalBody>
-                          <GitHubStats />
+                          <GitHubStatsNP />
                         </ModalBody>
                         <ModalFooter>
                           <Button

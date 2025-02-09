@@ -21,7 +21,7 @@ interface Stats {
   reputation: number;
 }
 
-const LeetCodeStats: React.FC = ({ onProfileLinked }) => {
+const LeetCodeStats: React.FC = () => {
   const { data: session } = useSession(); // Get the session data
   const [username, setUsername] = useState<string>("");
   const [stats, setStats] = useState<Stats | null>(null);
@@ -49,7 +49,6 @@ const LeetCodeStats: React.FC = ({ onProfileLinked }) => {
 
       if (data.status === "success") {
         setStats(data);
-        onProfileLinked(true);
         setIcon(<TbCheck className="text-3xl text-green-600" />);
         const updateResponse = await fetch("/api/update-leetcode-stats", {
           method: "POST",
@@ -67,16 +66,13 @@ const LeetCodeStats: React.FC = ({ onProfileLinked }) => {
 
         if (!updateResponse.ok) {
           console.error("Failed to update stats in the database.");
-          onProfileLinked(false);
         }
       } else {
         setError("No such username found.");
         setIcon(<TbLink className="text-3xl text-white" />);
-        onProfileLinked(false);
       }
     } catch (err) {
       setError("Error fetching data.");
-      onProfileLinked(false);
       setIcon(<TbLink className="text-3xl text-white" />);
     }
   };

@@ -3,8 +3,8 @@ import { connectMongoDB } from "../../../lib/mongodb";
 import User from "../../../models/user";
 
 export async function POST(request) {
-  const { name, email, image } = await request.json();
+  const { name, email, image, onboard } = await request.json();
   await connectMongoDB();
-  await User.create({ name, email, image });
+  await User.create({ name, email, image, onboard });
   return NextResponse.json({ message: "User Registered" }, { status: 201 });
 }

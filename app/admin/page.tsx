@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import LeaderboardAdmin from "@/components/LeaderboardAdmin";
 import ExportButton from "@/components/ExportButton";
+import OpportunitiesAdmin from "@/components/OpportunityAdmin";
+import { Tab, Tabs } from "@heroui/react";
+import CoursesAdmin from "@/components/CoursesAdmin";
 
 const ADMIN_EMAILS = ["keertan.k@gmail.com", "admin2@example.com"];
 
@@ -23,8 +26,18 @@ export default function AdminPage() {
 
   return (
     <div>
-      <ExportButton />
-      <LeaderboardAdmin />
+      <Tabs aria-label="Profile Details" color={"danger"} variant={"light"}>
+        <Tab key="opportunities" title="Opportunities">
+          <OpportunitiesAdmin />
+        </Tab>
+        <Tab key="courses" title="Courses">
+          <CoursesAdmin />
+        </Tab>
+        <Tab key="leaderboard" title="Leaderboard">
+          <LeaderboardAdmin />
+          <ExportButton />
+        </Tab>
+      </Tabs>
     </div>
   );
 }

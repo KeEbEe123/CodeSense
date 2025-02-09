@@ -46,9 +46,9 @@ const AboutYourself = ({ onSuccess }: { onSuccess: () => void }) => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6 font-koulen">
-      {/* Left Pane: Add items */}
-      <div className="w-full md:w-1/2 space-y-6">
+    <div className="flex flex-col md:flex-row gap-6 font-koulen min-h-screen">
+      {/* Left Pane: Forms Section */}
+      <div className="w-full md:w-1/2 flex flex-col space-y-6 pr-6 ml-2 md:ml-4 lg:ml-10">
         {/* Certifications Section */}
         <div>
           <label className="flex items-center space-x-2">
@@ -69,24 +69,21 @@ const AboutYourself = ({ onSuccess }: { onSuccess: () => void }) => {
             </Tooltip>
           </label>
 
-          {/* Smooth size transition */}
+          {/* Smooth transition for forms */}
           <motion.div
-            initial={false} // Prevents resetting on remount
+            initial={false}
             animate={{
               height: noneToggled.certifications ? 0 : "auto",
               opacity: noneToggled.certifications ? 0 : 1,
             }}
-            style={{ overflow: "hidden" }}
-            transition={{
-              height: { duration: 0.5, ease: "easeInOut" },
-              opacity: { duration: 0.3, ease: "easeInOut" },
-            }}
+            className="overflow-hidden"
+            transition={{ duration: 0.4, ease: "easeInOut" }}
           >
             {!noneToggled.certifications && userid && (
               <div className="mt-4">
                 <CertificationForm
                   userId={userid}
-                  onAdd={handleAddCertification} // Pass handler to form
+                  onAdd={handleAddCertification}
                 />
               </div>
             )}
@@ -113,25 +110,19 @@ const AboutYourself = ({ onSuccess }: { onSuccess: () => void }) => {
             </Tooltip>
           </label>
 
-          {/* Smooth size transition */}
+          {/* Smooth transition for forms */}
           <motion.div
             initial={false}
             animate={{
               height: noneToggled.internships ? 0 : "auto",
               opacity: noneToggled.internships ? 0 : 1,
             }}
-            style={{ overflow: "hidden" }}
-            transition={{
-              height: { duration: 0.5, ease: "easeInOut" },
-              opacity: { duration: 0.3, ease: "easeInOut" },
-            }}
+            className="overflow-hidden"
+            transition={{ duration: 0.4, ease: "easeInOut" }}
           >
             {!noneToggled.internships && userid && (
               <div className="mt-4">
-                <InternshipForm
-                  userId={userid}
-                  onAdd={handleAddInternship} // Pass handler to form
-                />
+                <InternshipForm userId={userid} onAdd={handleAddInternship} />
               </div>
             )}
           </motion.div>
@@ -140,24 +131,22 @@ const AboutYourself = ({ onSuccess }: { onSuccess: () => void }) => {
         {/* Navigation Button */}
         <button
           onClick={handleNext}
-          className="mt-6 px-4 py-2 bg-blue-600 text-white rounded"
+          className="mt-6 px-4 py-2 bg-green-500 font-pop font-bold hover:bg-green-600 text-white rounded"
         >
-          Next
+          Save and Continue
         </button>
       </div>
 
-      {/* Right Pane: Display added entries */}
-      <div className="lg:w-full md:w-1/2 md:space-y-6 hidden md:block">
-        <h2 className="text-lg font-koulen">Your Entries</h2>
-
+      {/* Right Pane: Display Entries */}
+      <div className="w-full md:w-1/2 flex flex-col space-y-6 ml-3">
         {/* Display Certifications */}
         {certifications.length > 0 && (
-          <div className="">
+          <div>
             <h3 className="text-md font-koulen mb-2">Certifications</h3>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {certifications.map((cert, index) => (
                 <Card
-                  className="pb-2 mx-3 bg-gradient-to-bl from-gray-800 to-background"
+                  className="pb-2 bg-gradient-to-bl from-gray-800 to-background"
                   key={index}
                 >
                   <CardBody className="text-offwhite font-pop">
@@ -173,13 +162,15 @@ const AboutYourself = ({ onSuccess }: { onSuccess: () => void }) => {
             </div>
           </div>
         )}
+
+        {/* Display Internships */}
         {internships.length > 0 && (
-          <div className="">
+          <div>
             <h3 className="text-md font-koulen mb-2">Internships</h3>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {internships.map((inte, index) => (
                 <Card
-                  className="pb-2 mx-3 bg-gradient-to-bl from-gray-800 to-background"
+                  className="pb-2 bg-gradient-to-bl from-gray-800 to-background"
                   key={index}
                 >
                   <CardBody className="text-offwhite font-pop">

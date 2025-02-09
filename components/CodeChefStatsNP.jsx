@@ -1,34 +1,18 @@
 "use client";
 
-import React, { useState, ChangeEvent } from "react";
-import { useSession } from "next-auth/react"; // Hook to access the current session
-import { Koulen } from "next/font/google"; // Import the Koulen font
-import { Input, Button } from "@heroui/react"; // Import the Input component from NextUI
+import React, { useState } from "react";
+import { useSession } from "next-auth/react";
+import { Input, Button } from "@heroui/react";
 import { TbCheck, TbLink, TbRefresh } from "react-icons/tb";
 
-interface Stats {
-  totalSolved: number;
-  totalQuestions: number;
-  easySolved: number;
-  totalEasy: number;
-  mediumSolved: number;
-  totalMedium: number;
-  hardSolved: number;
-  totalHard: number;
-  acceptanceRate: number;
-  ranking: number;
-  contributionPoints: number;
-  reputation: number;
-}
-
-const LeetCodeStats: React.FC = ({ onProfileLinked }) => {
+const CodeChefStats = () => {
   const { data: session } = useSession(); // Get the session data
-  const [username, setUsername] = useState<string>("");
-  const [stats, setStats] = useState<Stats | null>(null);
-  const [error, setError] = useState<string>("");
+  const [username, setUsername] = useState("");
+  const [stats, setStats] = useState(null);
+  const [error, setError] = useState("");
   const [icon, setIcon] = useState(<TbLink className="text-3xl text-white" />);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e) => {
     setUsername(e.target.value);
   };
 
@@ -41,42 +25,41 @@ const LeetCodeStats: React.FC = ({ onProfileLinked }) => {
     setError("");
     setStats(null);
     setIcon(<TbLink className="text-3xl text-white animate-spin" />);
+
     try {
       const response = await fetch(
-        `https://leetcode-stats-api.herokuapp.com/${username}`
+        `https://codechef-api.vercel.app/handle/${username}`
       );
       const data = await response.json();
 
-      if (data.status === "success") {
+      if (data.success) {
         setStats(data);
-        onProfileLinked(true);
         setIcon(<TbCheck className="text-3xl text-green-600" />);
-        const updateResponse = await fetch("/api/update-leetcode-stats", {
+
+        const updateResponse = await fetch("/api/update-codechef-stats", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            email: session?.user?.email,
-            leetcodeUsername: username,
+            email: session.user.email,
+            codechefUsername: username,
             stats: {
-              totalSolved: data.totalSolved,
+              rating: data.currentRating || "N/A",
+              rank: data.globalRank || "N/A",
             },
           }),
         });
 
         if (!updateResponse.ok) {
           console.error("Failed to update stats in the database.");
-          onProfileLinked(false);
         }
       } else {
         setError("No such username found.");
         setIcon(<TbLink className="text-3xl text-white" />);
-        onProfileLinked(false);
       }
     } catch (err) {
       setError("Error fetching data.");
-      onProfileLinked(false);
       setIcon(<TbLink className="text-3xl text-white" />);
     }
   };
@@ -93,13 +76,13 @@ const LeetCodeStats: React.FC = ({ onProfileLinked }) => {
       <div className="flex w-full mb-4">
         <Input
           type="text"
-          label="Enter LeetCode Username"
+          label="Enter CodeChef Username"
+          value={username}
+          onChange={handleChange}
           classNames={{
             label: "text-white",
             input: "text-white placeholder-white",
           }}
-          value={username}
-          onChange={handleChange}
           className="rounded-md text-blue-500 font-pop bg-transparent focus:outline-none flex-grow mr-2"
         />
         <Button
@@ -115,31 +98,26 @@ const LeetCodeStats: React.FC = ({ onProfileLinked }) => {
           </Button>
         )}
       </div>
+
       {error && <p className="text-red-500 mt-4">{error}</p>}
 
       {stats && !error && (
         <div className="mt-6 text-lg text-offwhite">
           <h2 className="text-2xl mb-4">Stats for {username}</h2>
-          <p>
-            Total Solved: {stats.totalSolved}/{stats.totalQuestions}
-          </p>
-          <p>
-            Easy Solved: {stats.easySolved}/{stats.totalEasy}
-          </p>
-          <p>
-            Medium Solved: {stats.mediumSolved}/{stats.totalMedium}
-          </p>
-          <p>
-            Hard Solved: {stats.hardSolved}/{stats.totalHard}
-          </p>
-          <p>Acceptance Rate: {stats.acceptanceRate}%</p>
-          <p>Ranking: {stats.ranking}</p>
-          <p>Contribution Points: {stats.contributionPoints}</p>
-          <p>Reputation: {stats.reputation}</p>
+          <p>Rating: {stats.currentRating || "N/A"}</p>
+          <p>Global Rank: {stats.globalRank || "N/A"}</p>
+          <p>Country: {stats.countryName || "N/A"}</p>
+          <p>Stars: {stats.stars || "N/A"}</p>
+          <p>Profile Picture:</p>
+          <img
+            src={stats.profile}
+            alt="Profile"
+            className="w-12 h-12 rounded-full mt-2"
+          />
         </div>
       )}
     </div>
   );
 };
 
-export default LeetCodeStats;
+export default CodeChefStats;

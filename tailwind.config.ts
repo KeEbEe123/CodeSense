@@ -28,5 +28,9 @@ export default {
     },
   },
   darkMode: "class",
-  plugins: [heroui()],
+  plugins: [
+    heroui({
+      defaultTheme: "dark",
+    }),
+  ],
 } satisfies Config;
