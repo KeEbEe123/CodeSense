@@ -5,74 +5,59 @@ import { Octokit } from "octokit";
 import cron from "node-cron";
 
 // Fetching Data Functions
-async function fetchCodeChefStats(username) {
+async function fetchCodeChefStats(username, prevScore) {
   try {
-    const response = await fetch(
-      `https://codechef-api.vercel.app/handle/${username}`
-    );
+    const response = await fetch(`https://codechef-api.vercel.app/handle/${username}`);
     const data = await response.json();
-    return data.success ? { score: data.heatMap?.length || 0 } : { score: 0 };
+    return data.success ? { score: data.heatMap?.length || 0 } : { score: prevScore };
   } catch (error) {
     console.error(`Error fetching CodeChef stats for ${username}:`, error);
-    return { score: 0 };
+    return { score: prevScore };
   }
 }
 
-async function fetchCodeforcesStats(username) {
+async function fetchCodeforcesStats(username, prevScore) {
   try {
-    const response = await fetch(
-      `https://codeforces.com/api/user.info?handles=${username}`
-    );
+    const response = await fetch(`https://codeforces.com/api/user.info?handles=${username}`);
     const data = await response.json();
-    return data.status === "OK"
-      ? { score: data.result[0].contribution || 0 }
-      : { score: 0 };
+    return data.status === "OK" ? { score: data.result[0].contribution || 0 } : { score: prevScore };
   } catch (error) {
     console.error(`Error fetching Codeforces stats for ${username}:`, error);
-    return { score: 0 };
+    return { score: prevScore };
   }
 }
 
-async function fetchLeetCodeStats(username) {
+async function fetchLeetCodeStats(username, prevScore) {
   try {
-    const response = await fetch(
-      `https://leetcode-stats-api.herokuapp.com/${username}`
-    );
+    const response = await fetch(`https://leetcode-stats-api.herokuapp.com/${username}`);
     const data = await response.json();
-    return data.status === "success"
-      ? { score: data.totalSolved || 0 }
-      : { score: 0 };
+    return data.status === "success" ? { score: data.totalSolved || 0 } : { score: prevScore };
   } catch (error) {
     console.error(`Error fetching LeetCode stats for ${username}:`, error);
-    return { score: 0 };
+    return { score: prevScore };
   }
 }
 
-async function fetchGitHubStats(username) {
-  if (!username) return { score: 0 };
+async function fetchGitHubStats(username, prevScore) {
+  if (!username) return { score: prevScore };
 
   try {
     const octokit = new Octokit({
       auth: process.env.NEXT_PUBLIC_GITHUB_ACCESS_TOKEN,
     });
 
-    const reposResponse = await octokit.request("GET /users/{username}/repos", {
-      username,
-    });
-    if (!reposResponse?.data.length) return { score: 0 };
+    const reposResponse = await octokit.request("GET /users/{username}/repos", { username });
+    if (!reposResponse?.data.length) return { score: prevScore };
 
     let totalCommits = 0;
     await Promise.all(
       reposResponse.data.map(async (repo) => {
         try {
-          const commitsResponse = await octokit.request(
-            "GET /repos/{owner}/{repo}/commits",
-            {
-              owner: username,
-              repo: repo.name,
-              headers: { "X-GitHub-Api-Version": "2022-11-28" },
-            }
-          );
+          const commitsResponse = await octokit.request("GET /repos/{owner}/{repo}/commits", {
+            owner: username,
+            repo: repo.name,
+            headers: { "X-GitHub-Api-Version": "2022-11-28" },
+          });
           totalCommits += commitsResponse.data.length || 0;
         } catch (error) {
           console.error(`Error fetching commits for ${repo.name}:`, error);
@@ -83,7 +68,7 @@ async function fetchGitHubStats(username) {
     return { score: totalCommits };
   } catch (error) {
     console.error("Error fetching GitHub stats:", error);
-    return { score: 0 };
+    return { score: prevScore };
   }
 }
 
@@ -91,27 +76,32 @@ async function fetchGitHubStats(username) {
 async function updateLeaderboardBatch(users) {
   for (const user of users) {
     try {
+      const prevCodechef = user.platforms.codechef?.score || 0;
+      const prevCodeforces = user.platforms.codeforces?.score || 0;
+      const prevLeetcode = user.platforms.leetcode?.score || 0;
+      const prevGithub = user.platforms.github?.score || 0;
+
       const codechefStats = user.platforms.codechef?.username
-        ? await fetchCodeChefStats(user.platforms.codechef.username)
-        : { score: 0 };
+        ? await fetchCodeChefStats(user.platforms.codechef.username, prevCodechef)
+        : { score: prevCodechef };
 
       const codeforcesStats = user.platforms.codeforces?.username
-        ? await fetchCodeforcesStats(user.platforms.codeforces.username)
-        : { score: 0 };
+        ? await fetchCodeforcesStats(user.platforms.codeforces.username, prevCodeforces)
+        : { score: prevCodeforces };
 
       const leetcodeStats = user.platforms.leetcode?.username
-        ? await fetchLeetCodeStats(user.platforms.leetcode.username)
-        : { score: 0 };
+        ? await fetchLeetCodeStats(user.platforms.leetcode.username, prevLeetcode)
+        : { score: prevLeetcode };
 
       const githubStats = user.platforms.github?.username
-        ? await fetchGitHubStats(user.platforms.github.username)
-        : { score: 0 };
+        ? await fetchGitHubStats(user.platforms.github.username, prevGithub)
+        : { score: prevGithub };
 
       const totalScore =
-        (codechefStats?.score || 0) +
-        (codeforcesStats?.score || 0) +
-        (leetcodeStats?.score || 0) +
-        (githubStats?.score || 0);
+        codechefStats.score +
+        codeforcesStats.score +
+        leetcodeStats.score +
+        githubStats.score;
 
       await User.findByIdAndUpdate(user._id, {
         "platforms.codechef.score": codechefStats.score,
@@ -134,10 +124,7 @@ async function refreshLeaderboard() {
   const updateInterval = 60000; // 1 minute
 
   for (let i = 0; i < users.length; i += batchSize) {
-    setTimeout(
-      () => updateLeaderboardBatch(users.slice(i, i + batchSize)),
-      (i / batchSize) * updateInterval
-    );
+    setTimeout(() => updateLeaderboardBatch(users.slice(i, i + batchSize)), (i / batchSize) * updateInterval);
   }
 
   // After batch update, update the ranks
@@ -150,7 +137,7 @@ async function refreshLeaderboard() {
 }
 
 // Schedule Auto-Update at Midnight IST (18:30 UTC)
-cron.schedule("20 16 * * *", refreshLeaderboard, {
+cron.schedule("0 18 * * *", refreshLeaderboard, {
   timezone: "Asia/Kolkata",
 });
 
@@ -169,9 +156,6 @@ export async function POST() {
     return NextResponse.json(leaderboard, { status: 200 });
   } catch (error) {
     console.error("Error updating leaderboard:", error);
-    return NextResponse.json(
-      { message: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
   }
 }
