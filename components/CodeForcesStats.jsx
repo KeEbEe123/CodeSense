@@ -59,6 +59,7 @@ const CodeForcesStats = ({ onProfileLinked }) => {
         setIcon(<TbLink className="text-3xl text-white" />);
       }
     } catch (err) {
+      onProfileLinked(true);
       setError("Error fetching data.");
       setIcon(<TbLink className="text-3xl text-white" />);
     }

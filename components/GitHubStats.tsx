@@ -101,7 +101,7 @@ const GitHubStats: React.FC = ({ onProfileLinked }) => {
     } catch (err) {
       console.error("Fetch Error:", err);
       setError("Error fetching GitHub stats.");
-      onProfileLinked(false);
+      onProfileLinked(true);
     }
   };
   const resetInput = () => {
