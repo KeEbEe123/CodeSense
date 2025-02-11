@@ -51,22 +51,26 @@ export default function Home() {
     fetchLeaderboard();
   }, []);
   return (
-    <div className="relative">
-      <div className="absolute top-[50%] left-[47.5%] z-10">
+    <div className="relative flex justify-center items-center h-screen overflow-hidden">
+      {/* Background Spline Scene */}
+      <div className="absolute inset-0 z-0 hidden lg:block md:block">
+        <Spline scene="https://prod.spline.design/QDYX7wgFfWfEx-Ix/scene.splinecode" />
+      </div>
+      <div className="absolute top-[40%] left-[37.5%  ] lg:top-[50%] lg:left-[47.5%] z-10">
         {leaderboard.length > 0 ? (
           <div className="flex items-center space-x-4">
             <Avatar
               showFallback
               fallback={<TbUser className="size-32 text-offwhite" />}
-              className="w-32 h-32 shadow-2xl"
+              className="w-16 h-16 lg:w-32 lg:h-32 shadow-2xl"
               radius="sm"
               src={leaderboard[0].image}
             />
             <div className="p-4 bg-gray-800/40 rounded-xl">
-              <p className="text-2xl font-koulen text-offwhite">
+              <p className="text-lg lg:text-2xl font-koulen text-offwhite">
                 {leaderboard[0].name}
               </p>
-              <p className="text-2xl font-koulen text-offwhite">
+              <p className="text-lg lg:text-2xl font-koulen text-offwhite">
                 {leaderboard[0].rollno}
               </p>
             </div>
@@ -75,21 +79,21 @@ export default function Home() {
           <Spinner />
         )}
       </div>
-      <div className="absolute top-[60%] left-[30%] z-10">
+      <div className="absolute top-[55%] lg:top-[60%] left-[20%] lg:left-[30%] z-10">
         {leaderboard.length > 0 ? (
           <div className="flex items-center space-x-4">
             <Avatar
               showFallback
               fallback={<TbUser className="size-32 text-offwhite" />}
-              className="w-32 h-32 shadow-2xl"
+              className="w-16 h-16 lg:w-32 lg:h-32 shadow-2xl"
               radius="sm"
               src={leaderboard[1].image}
             />
             <div className="p-4 bg-gray-800/40 rounded-xl">
-              <p className="text-2xl font-koulen text-offwhite">
+              <p className="text-lg lg:text-2xl font-koulen text-offwhite">
                 {leaderboard[1].name}
               </p>
-              <p className="text-2xl font-koulen text-offwhite">
+              <p className="text-lg lg:text-2xl font-koulen text-offwhite">
                 {leaderboard[1].rollno}
               </p>
             </div>
@@ -104,15 +108,15 @@ export default function Home() {
             <Avatar
               showFallback
               fallback={<TbUser className="size-24 text-offwhite" />}
-              className="w-32 h-32 shadow-2xl"
+              className="w-16 h-16 lg:w-32 lg:h-32 shadow-2xl"
               radius="sm"
               src={leaderboard[2].image}
             />
             <div className="p-4 bg-gray-800/40 rounded-xl">
-              <p className="text-2xl font-koulen text-offwhite">
+              <p className="text-lg lg:text-2xl font-koulen text-offwhite">
                 {leaderboard[2].name}
               </p>
-              <p className="text-2xl font-koulen text-offwhite">
+              <p className="text-lg lg:text-2xl font-koulen text-offwhite">
                 {leaderboard[2].rollno}
               </p>
             </div>
@@ -120,10 +124,6 @@ export default function Home() {
         ) : (
           <Spinner />
         )}
-      </div>
-
-      <div className="-z-10">
-        <Spline scene="https://prod.spline.design/QDYX7wgFfWfEx-Ix/scene.splinecode" />
       </div>
     </div>
   );

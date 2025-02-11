@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { Avatar, Input } from "@heroui/react";
 import { signIn, signOut, useSession } from "next-auth/react";
@@ -13,28 +13,19 @@ import Image from "next/image";
 export default function SignInPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const error = searchParams ? searchParams.get("error") : null;
 
   useEffect(() => {
-    if (status === "authenticated") {
-      if (!session?.user?.onboard) {
-        router.replace("/onboarding"); // Redirect to onboarding if not onboarded
-      } else {
-        router.replace("/"); // Redirect to home if onboarded
-      }
+    if (error === "AccessDenied") {
+      toast.error("Please use your college account to sign in");
     }
-  }, [status, session, router]);
+    setTimeout(() => {
+      router.replace("/signin"); // Redirect to sign-in page
+    }, 1000); // Redirect after 3 seconds
+  }, [error, router]);
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const onboarded = localStorage.getItem("onboarded");
-      if (onboarded === "true") {
-        toast.success(
-          "Onboarding completed successfully! Please sign in again to continue"
-        );
-        localStorage.removeItem("onboarded"); // Prevent duplicate toasts
-      }
-    }
-  }, []); // Runs only once when component mounts
+  // Runs only once when component mounts
 
   return (
     <div className="relative flex justify-center items-center h-screen overflow-hidden">
@@ -43,7 +34,7 @@ export default function SignInPage() {
         <Spline scene="https://prod.spline.design/NBRAqAmjs0aDCXzp/scene.splinecode" />
       </div>
       <div className="absolute inset-0 z-0 lg:hidden md:hidden ml-4">
-        <Spline scene="https://prod.spline.design/IJjF8q1lz2hPMOJr/scene.splinecode" />
+        <Spline scene="https://prod.spline.design/o8IvYCTEj1eis0xM/scene.splinecode" />
       </div>
 
       {/* Overlay Content */}

@@ -4,8 +4,16 @@ import User from "../../../models/user";
 
 export async function POST(request) {
   try {
-    const { rollno, about, contact, linkedIn, email, department, section } =
-      await request.json();
+    const {
+      rollno,
+      about,
+      contact,
+      linkedIn,
+      email,
+      department,
+      section,
+      parentContact,
+    } = await request.json();
 
     if (!email || !rollno || !contact) {
       return NextResponse.json(
@@ -28,6 +36,7 @@ export async function POST(request) {
     user.Contact = contact;
     user.department = department;
     user.section = section;
+    user.ParentContact = parentContact;
 
     await user.save();
 

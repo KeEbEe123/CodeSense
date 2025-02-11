@@ -83,7 +83,7 @@ const CodeForcesStats = ({ onProfileLinked }) => {
             label: "text-white",
             input: "text-white placeholder-white",
           }}
-          className="mb-4 rounded-md text-blue-500 bg-transparent font-pop focus:outline-none w-full"
+          className="rounded-md text-blue-500 font-pop bg-transparent focus:outline-none flex-grow mr-2"
         />
         <Button
           onClick={fetchStats}

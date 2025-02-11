@@ -154,6 +154,7 @@ export const BasicDetails = ({ onSuccess }: { onSuccess: () => void }) => {
             name="about"
             placeholder="Write a short description about yourself"
             type="text"
+            isRequired
           />
         </div>
         <div className="mt-4 w-full">
@@ -164,6 +165,21 @@ export const BasicDetails = ({ onSuccess }: { onSuccess: () => void }) => {
             labelPlacement="outside"
             name="contact"
             placeholder="Enter your contact number"
+            type="tel"
+            classNames={{
+              label: "text-black",
+              input: "text-white placeholder-white",
+            }}
+          />
+        </div>
+        <div className="mt-4 w-full">
+          <Input
+            isRequired
+            errorMessage="Please enter a valid contact number"
+            label="Parent's Contact"
+            labelPlacement="outside"
+            name="parentContact"
+            placeholder="Enter your parent's contact number"
             type="tel"
             classNames={{
               label: "text-black",

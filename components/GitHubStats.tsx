@@ -135,6 +135,11 @@ const GitHubStats: React.FC = ({ onProfileLinked }) => {
         >
           {icon}
         </Button>
+        {stats && (
+          <Button onClick={resetInput} className="py-2 mt-4 bg-transparent">
+            <TbRefresh className="text-3xl text-white" />
+          </Button>
+        )}
       </div>
 
       {error && <p style={{ color: "red" }}>{error}</p>}

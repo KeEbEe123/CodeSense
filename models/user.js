@@ -65,6 +65,7 @@ const userSchema = new Schema(
     Skills: { type: String, default: "" },
     About: { type: String, default: "" },
     Contact: { type: String, default: "" },
+    ParentContact: { type: String, default: "" },
     linkedIn: { type: String, default: "" },
     projects: { type: String, default: "" },
     achievements: { type: String, default: "" },

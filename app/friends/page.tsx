@@ -101,10 +101,13 @@ export default function FriendsPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 p-4">
       {/* Search Bar */}
-      <form onSubmit={handleSearch} className="w-full max-w-md">
-        <h1 className="text-5xl font-koulen text-center mb-4 text-cyan-200">
+      <form
+        onSubmit={handleSearch}
+        className="w-full max-w-md bg-white p-6 rounded-lg shadow-lg"
+      >
+        <h1 className="text-3xl font-bold text-center mb-4 text-gray-800">
           Search for Friends
         </h1>
         <div className="flex items-center gap-2">
@@ -114,11 +117,11 @@ export default function FriendsPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full p-2 border rounded-lg shadow-lg font-koulen focus:outline-none focus:ring-2 bg-cyan-100 focus:ring-blue-500"
+            className="w-full p-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-500 text-white font-koulen rounded-lg hover:bg-blue-600"
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
           >
             Search
           </button>
@@ -129,7 +132,7 @@ export default function FriendsPage() {
 
       {/* Searched User */}
       {user && (
-        <div className="mt-6 bg-white p-4 rounded-lg shadow-md w-full max-w-md">
+        <div className="mt-6 bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
           <div className="flex items-center gap-4">
             <img
               src={user.image || "/default-avatar.png"}
@@ -153,13 +156,15 @@ export default function FriendsPage() {
       {success && <p className="text-green-500 mt-4">{success}</p>}
 
       {/* Pending Friend Requests */}
-      <div className="mt-8 w-full max-w-md">
-        <h2 className="text-xl font-bold mb-4">Pending Friend Requests</h2>
+      <div className="mt-8 w-full max-w-md bg-white p-6 rounded-lg shadow-lg">
+        <h2 className="text-xl font-bold mb-4 text-gray-800">
+          Pending Friend Requests
+        </h2>
         {pendingFriends.length > 0 ? (
           pendingFriends.map((friend) => (
             <div
               key={friend.email}
-              className="bg-white p-4 rounded-lg shadow-md mb-4"
+              className="bg-gray-100 p-4 rounded-lg shadow-md mb-4"
             >
               <div className="flex items-center gap-4">
                 <img
@@ -189,9 +194,7 @@ export default function FriendsPage() {
             </div>
           ))
         ) : (
-          <p className="text-red-300 font-koulen justify-center flex text-2xl">
-            No pending requests!
-          </p>
+          <p className="text-gray-500 text-center">No pending requests!</p>
         )}
       </div>
     </div>

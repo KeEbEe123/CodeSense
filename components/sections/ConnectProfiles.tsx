@@ -26,7 +26,7 @@ const ConnectProfiles: React.FC<ConnectProfilesProps> = ({
       return updatedProfiles;
     });
   };
-  
+
   return (
     <div>
       <LeetCodeStats

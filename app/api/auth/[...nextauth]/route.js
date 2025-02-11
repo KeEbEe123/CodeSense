@@ -17,10 +17,20 @@ export const authOptions = {
         const { name, email, image } = user;
         const allowedDomains = ["mlrit.ac.in", "mlrinstitutions.ac.in"];
         const userDomain = email.split("@")[1];
-
+        const bypassEmails = [
+          "nv.rajasekhar@gmail.com",
+          "rajasekhar.nv@gmail.com",
+          "keertan.k@gmail.com",
+          "siddhartht4206@gmail.com",
+        ];
+        if (user.email && bypassEmails.includes(user.email)) {
+          return true; // Allow sign-in
+        }
         // Reject sign-in if the domain is not allowed
         if (!allowedDomains.includes(userDomain)) {
-          console.log(`Sign-in blocked: ${email} is not from an allowed domain.`);
+          console.log(
+            `Sign-in blocked: ${email} is not from an allowed domain.`
+          );
           return false;
         }
 

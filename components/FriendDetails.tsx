@@ -62,9 +62,7 @@ const FriendDetails: React.FC<FriendDetailsProps> = ({ email }) => {
           <Image
             src={friendDetails.image || "/default-profile.png"}
             alt="Profile Picture"
-            width={50}
-            height={50}
-            className="rounded-full ring-4 ring-primary"
+            className="rounded-full ring-4 ring-primary w-10"
           />
         </div>
         <p className="text-sm text-gray-600">Email: {friendDetails.email}</p>
