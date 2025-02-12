@@ -11,7 +11,14 @@ export async function GET() {
       .select("name totalScore rank platforms rollno department section image")
       .exec();
 
-    return NextResponse.json(leaderboard, { status: 200 });
+    const response = NextResponse.json(leaderboard, { status: 200 });
+
+    // Allow all origins (use a more restrictive policy if needed)
+    response.headers.set("Access-Control-Allow-Origin", "*");
+    response.headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+    response.headers.set("Access-Control-Allow-Headers", "Content-Type");
+
+    return response;
   } catch (error) {
     console.error("Error fetching leaderboard:", error);
     return NextResponse.json(

@@ -101,7 +101,7 @@ export default function FriendsPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 p-4">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-gray-700 to-background p-4">
       {/* Search Bar */}
       <form
         onSubmit={handleSearch}
@@ -121,7 +121,7 @@ export default function FriendsPage() {
           />
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            className="px-4 py-2 font-pop font-bold bg-pink-600 text-white rounded-lg hover:bg-primary hover:text-background transition-all"
           >
             Search
           </button>
