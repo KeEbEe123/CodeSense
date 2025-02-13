@@ -29,7 +29,7 @@ interface Opportunity {
   formLink: string;
   departments: string[];
   applied: string[];
-  duration: string;
+  lastDate: string;
 }
 
 const OpportunitiesList = () => {
@@ -95,8 +95,15 @@ const OpportunitiesList = () => {
               </h3>
               <p className="text-sm sm:text-base">{opp.description}</p>
               <p className="text-xs sm:text-sm text-gray-400">
-                Duration: {opp.duration}
+                Duration: {opp.lastDate}
               </p>
+              <div className="absolute top-2 right-2">
+                {new Date(opp.lastDate) < new Date() ? (
+                  <Chip>Completed</Chip>
+                ) : (
+                  <Chip>Ongoing</Chip>
+                )}
+              </div>
               <div className="flex flex-col gap-2 mt-2">
                 <span className="font-thin font-pop text-sm px-1">
                   Eligible Departments:

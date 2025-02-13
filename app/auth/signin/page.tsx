@@ -7,7 +7,6 @@ import { Avatar, Input } from "@heroui/react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { TbBrandGoogle, TbBrandGoogleFilled } from "react-icons/tb";
 import Spline from "@splinetool/react-spline";
-
 import Image from "next/image";
 
 export default function SignInPage() {

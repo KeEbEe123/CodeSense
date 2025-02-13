@@ -23,7 +23,14 @@ const formatTotal = (total: number) => {
   return total >= 1000 ? `${(total / 1000).toFixed(1)}K` : total;
 };
 
-const colors = ["#FFA500", "#FF6347", "#4682B4", "#4d4d4d", "#FFD700"];
+const colors = [
+  "#FFA500",
+  "#FF6347",
+  "#4682B4",
+  "#4d4d4d",
+  "#FFD700",
+  "#32CD32",
+];
 
 export default function Component({ platforms }: ComponentProps) {
   const chartData: ChartData[] = Object.keys(platforms).map((key) => ({

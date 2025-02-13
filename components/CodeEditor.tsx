@@ -1,139 +1,92 @@
-"use client";
-import React, { useState } from "react";
-import dynamic from "next/dynamic";
-import axios from "axios";
+// import React, { useEffect, useRef, useState } from "react";
+// import * as monaco from "monaco-editor";
+// import axios from "axios";
 
-// Dynamically import Monaco Editor
-const Editor = dynamic(() => import("monaco-editor"), { ssr: false });
+// const Judge0_API = "https://judge0-ce.p.rapidapi.com/submissions";
+// const API_KEY = "your-judge0-api-key"; // Replace with your API key if needed
 
-const App = () => {
-  const [code, setCode] = useState("// Write your code here");
-  const [language, setLanguage] = useState("javascript");
-  const [output, setOutput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+// const CodeEditor: React.FC = () => {
+//   const editorRef = useRef<HTMLDivElement>(null);
+//   const monacoInstance = useRef<monaco.editor.IStandaloneCodeEditor | null>(
+//     null
+//   );
+//   const [output, setOutput] = useState<string | null>(null);
 
-  const languageOptions = [
-    { id: 63, name: "JavaScript" },
-    { id: 71, name: "Python" },
-    { id: 50, name: "C++" },
-    { id: 62, name: "Java" },
-  ];
+//   useEffect(() => {
+//     if (editorRef.current) {
+//       monacoInstance.current = monaco.editor.create(editorRef.current, {
+//         value: `print("Hello, World!")`, // Default Python code
+//         language: "python",
+//         theme: "vs-dark",
+//         automaticLayout: true,
+//       });
+//     }
 
-  const handleRunCode = async () => {
-    setIsLoading(true);
-    setOutput("");
+//     return () => {
+//       monacoInstance.current?.dispose();
+//     };
+//   }, []);
 
-    const selectedLanguage = languageOptions.find(
-      (lang) => lang.name === language
-    );
+//   const runCode = async () => {
+//     if (!monacoInstance.current) return;
+//     const sourceCode = monacoInstance.current.getValue();
 
-    if (!selectedLanguage) {
-      setOutput("Language not supported");
-      setIsLoading(false);
-      return;
-    }
+//     try {
+//       const response = await axios.post(
+//         `${Judge0_API}?base64_encoded=false&fields=*`,
+//         {
+//           language_id: 71, // Python (change based on need)
+//           source_code: sourceCode,
+//           stdin: "",
+//         },
+//         {
+//           headers: {
+//             "X-RapidAPI-Key": API_KEY,
+//             "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
+//             "Content-Type": "application/json",
+//           },
+//         }
+//       );
 
-    try {
-      const response = await axios.post(
-        "https://judge0-ce.p.rapidapi.com/submissions",
-        {
-          source_code: code,
-          language_id: selectedLanguage.id,
-          stdin: "",
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "X-RapidAPI-Key": "YOUR_RAPIDAPI_KEY",
-            "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
-          },
-        }
-      );
+//       const token = response.data.token;
+//       setTimeout(async () => {
+//         const result = await axios.get(`${Judge0_API}/${token}`, {
+//           headers: {
+//             "X-RapidAPI-Key": API_KEY,
+//             "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
+//           },
+//         });
 
-      const { token } = response.data;
+//         if (result.data.stdout) {
+//           setOutput(result.data.stdout);
+//         } else if (result.data.stderr) {
+//           setOutput(result.data.stderr);
+//         } else if (result.data.compile_output) {
+//           setOutput(result.data.compile_output);
+//         }
+//       }, 3000);
+//     } catch (error) {
+//       console.error("Error executing code:", error);
+//       setOutput("Failed to compile/run code.");
+//     }
+//   };
 
-      let result;
-      do {
-        result = await axios.get(
-          `https://judge0-ce.p.rapidapi.com/submissions/${token}?base64_encoded=false`,
-          {
-            headers: {
-              "X-RapidAPI-Key": "YOUR_RAPIDAPI_KEY",
-              "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
-            },
-          }
-        );
-      } while (result.data.status.id <= 2);
+//   return (
+//     <div className="h-screen flex flex-col items-center justify-center bg-gray-900 text-white">
+//       <div ref={editorRef} className="w-3/4 h-80 border border-gray-600"></div>
+//       <button
+//         onClick={runCode}
+//         className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded"
+//       >
+//         Run Code
+//       </button>
+//       {output && (
+//         <div className="mt-4 w-3/4 p-3 bg-gray-800 border border-gray-600 rounded">
+//           <pre>{output}</pre>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
 
-      setOutput(
-        result.data.stdout || result.data.stderr || "No output returned."
-      );
-    } catch (error) {
-      setOutput("Error executing code: " + error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
-      <h1>Code Editor with Judge0</h1>
-
-      <div style={{ marginBottom: "10px" }}>
-        <label htmlFor="language">Select Language: </label>
-        <select
-          id="language"
-          value={language}
-          onChange={(e) => setLanguage(e.target.value)}
-        >
-          {languageOptions.map((lang) => (
-            <option key={lang.id} value={lang.name}>
-              {lang.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <Editor
-        height="400px"
-        language={language.toLowerCase()}
-        value={code}
-        onChange={(value) => setCode(value)}
-        theme="vs-dark"
-      />
-
-      <div style={{ marginTop: "10px" }}>
-        <button
-          onClick={handleRunCode}
-          style={{
-            padding: "10px 20px",
-            fontSize: "16px",
-            cursor: "pointer",
-            backgroundColor: "#4CAF50",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-          }}
-          disabled={isLoading}
-        >
-          {isLoading ? "Running..." : "Run Code"}
-        </button>
-      </div>
-
-      <div
-        style={{
-          marginTop: "20px",
-          padding: "10px",
-          backgroundColor: "#f4f4f4",
-          border: "1px solid #ddd",
-          borderRadius: "4px",
-        }}
-      >
-        <h3>Output:</h3>
-        <pre>{output}</pre>
-      </div>
-    </div>
-  );
-};
-
-export default App;
+// export default CodeEditor;

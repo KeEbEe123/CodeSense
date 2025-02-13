@@ -9,6 +9,7 @@ import FriendDetails from "@/components/FriendDetails";
 import CircleChartCard from "@/components/CircleChartCard";
 import FriendsPage from "@/components/FriendsPage";
 import { TransitionLink } from "@/components/TransitionLink";
+import GitHubCalendar from "react-github-calendar";
 
 const Profile = ({ params }: { params: { id: string } }) => {
   const [user, setUser] = useState<any>(null);
@@ -95,9 +96,12 @@ const Profile = ({ params }: { params: { id: string } }) => {
             isVertical
           >
             <Tab key="overview" title="Overview">
-              <div className="flex flex-col md:flex-row sm:flex-row justify-between">
-                <Card className="pb-2 mx-3 bg-gradient-to-bl from-gray-800 to-background w-full mb-4 md:mb-0 md:w-1/2 ">
-                  <CardBody className="p-4 pr-0 lg:p-5 lg:pr-20">
+              <div className="w-full mb-4">
+                <GitHubCalendar username={user.platforms.github.username} />
+              </div>
+              <div className="flex flex-col md:flex-row sm:flex-row justify-between gap-4">
+                <Card className="pb-2 bg-gradient-to-bl from-gray-800 to-background w-full md:w-1/2">
+                  <CardBody className="p-4 lg:p-5">
                     <h3 className="font-pop text-xl text-gray-600 pb-2">
                       About Me
                     </h3>
@@ -106,7 +110,10 @@ const Profile = ({ params }: { params: { id: string } }) => {
                     </p>
                   </CardBody>
                 </Card>
-                <CircleChartCard platforms={platforms} />
+                <CircleChartCard
+                  platforms={platforms}
+                  className="w-full md:w-1/2"
+                />
               </div>
             </Tab>
 

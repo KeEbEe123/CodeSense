@@ -26,7 +26,7 @@ const OpportunityForm: React.FC<OpportunityFormProps> = ({
   const [departments, setDepartments] = useState(
     initialData?.departments?.join(", ") || ""
   );
-  const [duration, setDuration] = useState(initialData?.duration || "");
+  const [lastDate, setLastDate] = useState(initialData?.lastDate || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -41,7 +41,7 @@ const OpportunityForm: React.FC<OpportunityFormProps> = ({
       description,
 
       mainLink,
-      duration,
+      lastDate,
       departments: departments.split(",").map((d) => d.trim()),
     };
 
@@ -98,10 +98,9 @@ const OpportunityForm: React.FC<OpportunityFormProps> = ({
           value={departments}
           onChange={(e) => setDepartments(e.target.value)}
         />
-        <Input
-          label="Duration"
-          value={duration}
-          onChange={(e) => setDuration(e.target.value)}
+        <DatePicker
+          label="Last date to apply"
+          onChange={(date) => setLastDate(date?.toString() || "")}
           isRequired
         />
         <Button type="submit" disabled={loading}>

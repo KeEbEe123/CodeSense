@@ -19,6 +19,8 @@ const LeaderboardUser = () => {
       codechef?: { score: number };
       codeforces?: { score: number };
       github?: { score: number };
+      hackerrank?: { score: number };
+      geeksforgeeks?: { score: number };
     };
   }
 
@@ -83,6 +85,8 @@ const LeaderboardUser = () => {
           "codechefScore",
           "codeforcesScore",
           "githubScore",
+          "hackerrankScore",
+          "gfgScore",
         ].includes(key)
       ) {
         const platformKey = key.replace("Score", ""); // Extract platform name
@@ -155,7 +159,7 @@ const LeaderboardUser = () => {
           <table className="w-full border-collapse border border-blue-600 shadow-lg rounded-lg">
             <thead className="bg-[#333333] text-blue-500">
               <tr>
-                {[ 
+                {[
                   { label: "Rank", key: "rank" },
                   { label: "Name", key: "name" },
                   { label: "Email", key: "email" },
@@ -167,6 +171,8 @@ const LeaderboardUser = () => {
                   { label: "CodeChef", key: "codechefScore" },
                   { label: "CodeForces", key: "codeforcesScore" },
                   { label: "GitHub", key: "githubScore" },
+                  { label: "HackerRank", key: "hackerrankScore" },
+                  { label: "GeeksForGeeks", key: "gfgScore" },
                 ].map(({ label, key }) => (
                   <th
                     key={key}
@@ -179,47 +185,66 @@ const LeaderboardUser = () => {
               </tr>
             </thead>
             <tbody className="bg-[#2a2a2a] text-offwhite">
-  {filteredLeaderboard.map((user) => (
-    <tr
-      key={user._id}
-      className={`hover:bg-[#3a3a3a] transition-all cursor-pointer ${
-        user.rank === 1
-          ? "bg-yellow-500/70"
-          : user.rank === 2
-          ? "bg-gray-400/70"
-          : user.rank === 3
-          ? "bg-yellow-700/70"
-          : user.email === userEmail
-          ? "bg-pink-600/50"
-          : ""
-      }`}
-      onClick={() => handleRowClick(user._id)}
-    >
-      <td className="border border-blue-600 px-4 py-2">{user.rank || "-"}</td>
-      <td className="border border-blue-600 px-4 py-2">{user.name}</td>
-      <td className="border border-blue-600 px-4 py-2">{user.email}</td>
-      <td className="border border-blue-600 px-4 py-2">{user.rollno}</td>
-      <td className="border border-blue-600 px-4 py-2">{user.department}</td>
-      <td className="border border-blue-600 px-4 py-2">{user.section}</td>
-      <td className="border border-blue-600 px-4 py-2">{user.totalScore}</td>
-      
-      {/* ✅ FIX: Render platform scores correctly */}
-      <td className="border border-blue-600 px-4 py-2">
-        {user.platforms?.leetcode?.score ?? "-"}
-      </td>
-      <td className="border border-blue-600 px-4 py-2">
-        {user.platforms?.codechef?.score ?? "-"}
-      </td>
-      <td className="border border-blue-600 px-4 py-2">
-        {user.platforms?.codeforces?.score ?? "-"}
-      </td>
-      <td className="border border-blue-600 px-4 py-2">
-        {user.platforms?.github?.score ?? "-"}
-      </td>
-    </tr>
-  ))}
-</tbody>
+              {filteredLeaderboard.map((user) => (
+                <tr
+                  key={user._id}
+                  className={`hover:bg-[#3a3a3a] transition-all cursor-pointer ${
+                    user.rank === 1
+                      ? "bg-yellow-500/70"
+                      : user.rank === 2
+                      ? "bg-gray-400/70"
+                      : user.rank === 3
+                      ? "bg-yellow-700/70"
+                      : user.email === userEmail
+                      ? "bg-pink-600/50"
+                      : ""
+                  }`}
+                  onClick={() => handleRowClick(user._id)}
+                >
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.rank || "-"}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.name}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.email}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.rollno}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.department}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.section}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.totalScore}
+                  </td>
 
+                  {/* ✅ FIX: Render platform scores correctly */}
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.platforms?.leetcode?.score ?? "-"}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.platforms?.codechef?.score ?? "-"}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.platforms?.codeforces?.score ?? "-"}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.platforms?.github?.score ?? "-"}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.platforms?.hackerrank?.score ?? "-"}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.platforms?.geeksforgeeks?.score ?? "-"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
           </table>
         </Skeleton>
       </div>

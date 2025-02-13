@@ -53,14 +53,17 @@ export async function GET(req) {
       const platforms = user.platforms || {};
       return {
         UserID: user.id,
-        Name: user.name,
+        UserName: user.name,
+        UserRoll: user.rollno,
+        Department: user.department,
+        Section: user.Section,
         LeetCodeUsername: platforms.leetcode?.username || "N/A",
         LeetCodeScore: platforms.leetcode?.score || 0,
         CodeforcesUsername: platforms.codeforces?.username || "N/A",
         CodeforcesScore: platforms.codeforces?.score || 0,
-        CodeChefUsername: platforms.codechef?.score || 0,
+        CodeChefUsername: platforms.codechef?.username || 0,
         CodeChefScore: platforms.codechef?.score || 0,
-        GithubUsername: platforms.github?.score || 0,
+        GithubUsername: platforms.github?.username || 0,
         GithubCommits: platforms.github?.score || 0,
         // Add other platforms similarly
       };
@@ -77,6 +80,10 @@ export async function GET(req) {
       user.certifications?.forEach((cert) => {
         certificationsSheetData.push({
           UserID: user.id,
+          UserName: user.name,
+          UserRoll: user.rollno,
+          Department: user.department,
+          Section: user.Section,
           Name: cert.name,
           Issuer: cert.issuer,
           Date: cert.date,
@@ -102,6 +109,10 @@ export async function GET(req) {
       user.internships?.forEach((intern) => {
         internshipsSheetData.push({
           UserID: user.id,
+          UserName: user.name,
+          UserRoll: user.rollno,
+          Department: user.department,
+          Section: user.Section,
           Title: intern.title,
           Company: intern.company,
           StartDate: intern.startDate,

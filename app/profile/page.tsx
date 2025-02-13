@@ -11,6 +11,13 @@ import { Tabs, Tab, Image, Card, CardBody } from "@heroui/react";
 import FriendDetails from "@/components/FriendDetails";
 import CircleChartCard from "@/components/CircleChartCard";
 import axios from "axios";
+import {
+  Container,
+  SimpleGrid,
+  Stack,
+  useMantineTheme,
+  px,
+} from "@mantine/core";
 import FriendsPage from "../friends/page";
 import { TbPencil } from "react-icons/tb";
 import {
@@ -29,8 +36,11 @@ import { TransitionLink } from "@/components/TransitionLink";
 import LeetCodeStatsNP from "@/components/LeetCodeStatsNP";
 import CodeChefStatsNP from "@/components/CodeChefStatsNP";
 import CodeForcesStatsNP from "@/components/CodeForcesStatsNP";
+import HackerRankStatsNP from "@/components/HackerRankStatsNP";
 import GitHubStatsNP from "@/components/GitHubStatsNP";
 import { Skeleton } from "@nextui-org/react";
+import GFGStatsNP from "@/components/GFGStatsNP";
+import GitHubCalendar from "react-github-calendar";
 
 const ProfilePage = () => {
   const { status, data: session } = useSession();
@@ -43,7 +53,13 @@ const ProfilePage = () => {
   const [isCodechefOpen, setCodechefOpen] = useState(false);
   const [isCodeforcesOpen, setCodeforcesOpen] = useState(false);
   const [isGithubOpen, setGithubOpen] = useState(false);
+  const [isGFGOpen, setGFGOpen] = useState(false);
+  const [isHackerrankOpen, setHackerrankOpen] = useState(false);
   const [isEditProfileOpen, setEditProfileOpen] = useState(false);
+
+  const BASE_HEIGHT = 360;
+  const getSubHeight = (children: number, spacing: number) =>
+    BASE_HEIGHT / children - spacing * ((children - 1) / children);
 
   const onOpenLeetcode = () => setLeetcodeOpen(true);
   const onCloseLeetcode = () => {
@@ -66,6 +82,17 @@ const ProfilePage = () => {
   const onOpenGithub = () => setGithubOpen(true);
   const onCloseGithub = () => {
     setGithubOpen(false);
+    fetchUser();
+  };
+
+  const onOpenHackerrank = () => setHackerrankOpen(true);
+  const onCloseHackerrank = () => {
+    setHackerrankOpen(false);
+    fetchUser();
+  };
+  const onOpenGFG = () => setGFGOpen(true);
+  const onCloseGFG = () => {
+    setGFGOpen(false);
     fetchUser();
   };
 
@@ -145,6 +172,16 @@ const ProfilePage = () => {
       score: user.platforms.github.score,
       total: 100,
     },
+    hackerrank: {
+      username: `${user.platforms.hackerrank.username}`,
+      score: user.platforms.hackerrank.score,
+      total: 100,
+    },
+    geeksforgeeks: {
+      username: `${user.platforms.geeksforgeeks.username}`,
+      score: user.platforms.geeksforgeeks.score,
+      total: 100,
+    },
   };
   return (
     <div className="flex flex-col items-center md:flex-row md:justify-center md:items-start md:gap-8 mt-8 px-4">
@@ -177,8 +214,12 @@ const ProfilePage = () => {
             color={"danger"}
             variant={"light"}
             isVertical
+            className="font-koulen"
           >
             <Tab key="overview" title="Overview">
+              <div className="lg:w-full lg:mb-4 hidden lg:block">
+                <GitHubCalendar username={user.platforms.github.username} />
+              </div>
               <div className="flex flex-col md:flex-row sm:flex-row justify-between">
                 <Card className="pb-2 mx-3 bg-gradient-to-bl from-gray-800 to-background w-full mb-4 md:mb-0 md:w-1/2 ">
                   <CardBody className="p-4 pr-0 lg:p-5 lg:pr-20">
@@ -192,7 +233,7 @@ const ProfilePage = () => {
                 </Card>
                 <CircleChartCard
                   platforms={platforms}
-                  className="w-full md:w-1/2"
+                  className="w-full md:w-1/2 lg:min-w-[70%]"
                 />
               </div>
             </Tab>
@@ -553,6 +594,88 @@ const ProfilePage = () => {
                     </ModalContent>
                   </Modal>
                 </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <p className="font-pop text-gray-400 text-xl">
+                  Hackerrank: {user.platforms.hackerrank.username}
+                </p>
+                <Button onPress={onOpenHackerrank} className="bg-transparent">
+                  <TbPencil className="cursor-pointer text-pink-600 text-2xl" />
+                </Button>
+                <Modal
+                  isOpen={isHackerrankOpen}
+                  onOpenChange={setHackerrankOpen}
+                  placement="top-center"
+                  className="bg-gradient-to-bl from-gray-800 to-background"
+                  backdrop="blur"
+                  hideCloseButton
+                  isKeyboardDismissDisabled={true}
+                  isDismissable={false}
+                >
+                  <ModalContent>
+                    <>
+                      <ModalHeader className="flex flex-col gap-1 font-pop text-offwhite text-2xl">
+                        Change Hackerrank Username
+                      </ModalHeader>
+                      <ModalBody>
+                        <HackerRankStatsNP />
+                      </ModalBody>
+                      <ModalFooter>
+                        <Button
+                          color="success"
+                          variant="flat"
+                          onPress={() => {
+                            onCloseHackerrank();
+                            fetchUser();
+                          }}
+                        >
+                          Save
+                        </Button>
+                      </ModalFooter>
+                    </>
+                  </ModalContent>
+                </Modal>
+              </div>
+              <div className="flex items-center gap-2">
+                <p className="font-pop text-gray-400 text-xl">
+                  GeeksForGeeks: {user.platforms.geeksforgeeks.username}
+                </p>
+                <Button onPress={onOpenGFG} className="bg-transparent">
+                  <TbPencil className="cursor-pointer text-pink-600 text-2xl" />
+                </Button>
+                <Modal
+                  isOpen={isGFGOpen}
+                  onOpenChange={setGFGOpen}
+                  placement="top-center"
+                  className="bg-gradient-to-bl from-gray-800 to-background"
+                  backdrop="blur"
+                  hideCloseButton
+                  isKeyboardDismissDisabled={true}
+                  isDismissable={false}
+                >
+                  <ModalContent>
+                    <>
+                      <ModalHeader className="flex flex-col gap-1 font-pop text-offwhite text-2xl">
+                        Change GeeksForGeeks Username
+                      </ModalHeader>
+                      <ModalBody>
+                        <GFGStatsNP />
+                      </ModalBody>
+                      <ModalFooter>
+                        <Button
+                          color="success"
+                          variant="flat"
+                          onPress={() => {
+                            onCloseGFG();
+                            fetchUser();
+                          }}
+                        >
+                          Save
+                        </Button>
+                      </ModalFooter>
+                    </>
+                  </ModalContent>
+                </Modal>
               </div>
             </Tab>
           </Tabs>

@@ -3,6 +3,8 @@ import LeetCodeStats from "../LeetCodeStats";
 import CodeForcesStats from "../CodeForcesStats";
 import CodeChefStats from "../CodeChefStats";
 import GitHubStats from "../GitHubStats";
+import HackerRankStats from "../HackerRankStats";
+import GFGStats from "../GFGStats";
 
 interface ConnectProfilesProps {
   onProfilesLinked: (linked: boolean) => void;
@@ -16,6 +18,8 @@ const ConnectProfiles: React.FC<ConnectProfilesProps> = ({
     codeforces: false,
     codechef: false,
     github: false,
+    hackerrank: false,
+    gfg: false,
   });
 
   const updateProfileStatus = (platform: string, isLinked: boolean) => {
@@ -40,6 +44,12 @@ const ConnectProfiles: React.FC<ConnectProfilesProps> = ({
       />
       <GitHubStats
         onProfileLinked={(linked) => updateProfileStatus("github", linked)}
+      />
+      <HackerRankStats
+        onProfileLinked={(linked) => updateProfileStatus("hackerrank", linked)}
+      />
+      <GFGStats
+        onProfileLinked={(linked) => updateProfileStatus("gfg", linked)}
       />
     </div>
   );
