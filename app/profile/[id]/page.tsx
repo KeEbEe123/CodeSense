@@ -62,6 +62,16 @@ const Profile = ({ params }: { params: { id: string } }) => {
       score: user.platforms.github.score,
       total: 100,
     },
+    hackerrank: {
+      username: `${user.platforms.hackerrank.username}`,
+      score: user.platforms.hackerrank.score,
+      total: 100,
+    },
+    geeksforgeeks: {
+      username: `${user.platforms.geeksforgeeks.username}`,
+      score: user.platforms.geeksforgeeks.score,
+      total: 100,
+    },
   };
   return (
     <div className="flex flex-col items-center md:flex-row md:justify-center md:items-start md:gap-8 mt-8">
