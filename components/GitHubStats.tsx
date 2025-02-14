@@ -47,7 +47,7 @@ const GitHubStats: React.FC = ({ onProfileLinked }) => {
       );
 
       if (!reposResponse || !reposResponse.data.length) {
-        setError("No repositories found for this user.");
+        onProfileLinked(true);
         return;
       }
 
@@ -120,6 +120,7 @@ const GitHubStats: React.FC = ({ onProfileLinked }) => {
           fullWidth
           color="default"
           label="GitHub Username"
+          placeholder="Sidsmartz"
           value={username}
           onChange={handleChange}
           classNames={{

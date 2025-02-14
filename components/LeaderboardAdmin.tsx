@@ -15,7 +15,20 @@ const Leaderboard = () => {
 
   const userEmail = session?.user?.email;
   const router = useRouter();
-
+  const ADMIN_EMAILS = [
+    "keertan.k@gmail.com",
+    "admin2@example.com",
+    "siddhartht4206@gmail.com",
+    "23r21a12b3@mlrit.ac.in",
+    "23r21a1285@mlrit.ac.in",
+    "nv.rajasekhar@gmail.com",
+    "rajasekhar.nv@gmail.com",
+    "hodds@mlrinstitutions.ac.in",
+    "hodaiml@mlrinstitutions.ac.in",
+    "hodit@mlrinstitutions.ac.in",
+    "hodcse@mlrinstitutions.ac.in",
+    "pradeep13@mlrinstitutions.ac.in",
+  ];
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
@@ -81,8 +94,10 @@ const Leaderboard = () => {
     if (!a.rank && b.rank) return 1; // No-rank users go to bottom
     if (a.rank && !b.rank) return -1;
     for (const { key, direction } of sortConfig) {
-      const aValue = key.split(".").reduce((obj, keyPart) => obj[keyPart], a) ?? 0;
-      const bValue = key.split(".").reduce((obj, keyPart) => obj[keyPart], b) ?? 0;
+      const aValue =
+        key.split(".").reduce((obj, keyPart) => obj[keyPart], a) ?? 0;
+      const bValue =
+        key.split(".").reduce((obj, keyPart) => obj[keyPart], b) ?? 0;
       if (aValue < bValue) return direction === "asc" ? -1 : 1;
       if (aValue > bValue) return direction === "asc" ? 1 : -1;
     }
@@ -90,6 +105,7 @@ const Leaderboard = () => {
   });
 
   const filteredLeaderboard = sortedLeaderboard
+    .filter((user) => !ADMIN_EMAILS.includes(user.email))
     .filter((user) => {
       const query = searchQuery.toLowerCase();
       return (
@@ -103,7 +119,11 @@ const Leaderboard = () => {
 
   const getSortArrow = (key) => {
     const sortConfigItem = sortConfig.find((config) => config.key === key);
-    return sortConfigItem ? (sortConfigItem.direction === "asc" ? "↑" : "↓") : "";
+    return sortConfigItem
+      ? sortConfigItem.direction === "asc"
+        ? "↑"
+        : "↓"
+      : "";
   };
 
   return (
@@ -145,7 +165,11 @@ const Leaderboard = () => {
       </div>
 
       <div className="overflow-x-auto">
-        <Skeleton isLoaded={!loading} animated className="bg-background w-full rounded-xl">
+        <Skeleton
+          isLoaded={!loading}
+          animated
+          className="bg-background w-full rounded-xl"
+        >
           <table className="w-full border-collapse border border-blue-600 shadow-lg rounded-lg">
             <thead className="bg-[#333333] text-blue-500">
               <tr>
@@ -174,18 +198,43 @@ const Leaderboard = () => {
             </thead>
             <tbody className="bg-[#2a2a2a] text-blue-400">
               {filteredLeaderboard.map((user) => (
-                <tr key={user._id} className="hover:bg-[#3a3a3a] transition-all cursor-pointer">
-                  <td className="border border-blue-600 px-4 py-2">{user.rank ?? 0}</td>
-                  <td className="border border-blue-600 px-4 py-2">{user.name}</td>
-                  <td className="border border-blue-600 px-4 py-2">{user.email}</td>
-                  <td className="border border-blue-600 px-4 py-2">{user.rollno}</td>
-                  <td className="border border-blue-600 px-4 py-2">{user.department}</td>
-                  <td className="border border-blue-600 px-4 py-2">{user.section}</td>
-                  <td className="border border-blue-600 px-4 py-2">{user.totalScore ?? 0}</td>
-                  <td className="border border-blue-600 px-4 py-2">{user.platforms?.leetcode?.score ?? 0}</td>
-                  <td className="border border-blue-600 px-4 py-2">{user.platforms?.codechef?.score ?? 0}</td>
-                  <td className="border border-blue-600 px-4 py-2">{user.platforms?.codeforces?.score ?? 0}</td>
-                  <td className="border border-blue-600 px-4 py-2">{user.platforms?.github?.score ?? 0}</td>
+                <tr
+                  key={user._id}
+                  className="hover:bg-[#3a3a3a] transition-all cursor-pointer"
+                >
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.rank ?? 0}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.name}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.email}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.rollno}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.department}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.section}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.totalScore ?? 0}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.platforms?.leetcode?.score ?? 0}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.platforms?.codechef?.score ?? 0}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.platforms?.codeforces?.score ?? 0}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.platforms?.github?.score ?? 0}
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -94,6 +94,7 @@ const LeetCodeStats: React.FC = ({ onProfileLinked }) => {
         <Input
           type="text"
           label="Enter LeetCode Username"
+          placeholder="eg: Sidsmartz"
           classNames={{
             label: "text-white",
             input: "text-white placeholder-white",

@@ -114,6 +114,7 @@ const HackerRankStats: React.FC<Props> = ({ onProfileLinked }) => {
             label: "text-white",
             input: "text-white placeholder-white",
           }}
+          placeholder="eg: keertan_k"
           value={username}
           onChange={handleChange}
           className="rounded-md text-blue-500 font-pop bg-transparent focus:outline-none flex-grow mr-2"

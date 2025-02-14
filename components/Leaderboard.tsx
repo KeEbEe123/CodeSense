@@ -23,7 +23,20 @@ const LeaderboardUser = () => {
       geeksforgeeks?: { score: number };
     };
   }
-
+  const ADMIN_EMAILS = [
+    "keertan.k@gmail.com",
+    "admin2@example.com",
+    "siddhartht4206@gmail.com",
+    "23r21a12b3@mlrit.ac.in",
+    "23r21a1285@mlrit.ac.in",
+    "nv.rajasekhar@gmail.com",
+    "rajasekhar.nv@gmail.com",
+    "hodds@mlrinstitutions.ac.in",
+    "hodaiml@mlrinstitutions.ac.in",
+    "hodit@mlrinstitutions.ac.in",
+    "hodcse@mlrinstitutions.ac.in",
+    "pradeep13@mlrinstitutions.ac.in",
+  ];
   const [leaderboard, setLeaderboard] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -108,6 +121,7 @@ const LeaderboardUser = () => {
 
   // Ensure users with no rank are at the bottom
   const filteredLeaderboard = sortedLeaderboard
+    .filter((user) => !ADMIN_EMAILS.includes(user.email)) // Exclude admin emails
     .filter((user) => {
       const query = searchQuery.toLowerCase();
       return (

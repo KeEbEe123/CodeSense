@@ -91,6 +91,7 @@ const GFGStats: React.FC<{ onProfileLinked: (status: boolean) => void }> = ({
         <Input
           type="text"
           label="Enter GFG Username"
+          placeholder="eg: keertan_k"
           className="rounded-md text-blue-500 bg-transparent flex-grow mr-2"
           value={username}
           onChange={handleChange}

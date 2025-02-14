@@ -77,6 +77,7 @@ const CodeForcesStats = ({ onProfileLinked }) => {
         <Input
           type="text"
           label="Enter CodeForces Username"
+          placeholder="sidsmartz"
           value={username}
           onChange={handleChange}
           classNames={{

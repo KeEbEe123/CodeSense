@@ -5,7 +5,10 @@ import User from "../../../models/user";
 export async function GET() {
   try {
     await connectMongoDB();
-    const leaderboard = await User.find({ rank: { $type: "int" } })
+    const leaderboard = await User.find({
+      rank: { $type: "int" },
+      onboard: true,
+    })
       .sort({ rank: 1 })
       .select("name email totalScore rank platforms rollno department section")
       .exec();

@@ -10,6 +10,11 @@ const ADMIN_EMAILS = [
   "23r21a1285@mlrit.ac.in",
   "nv.rajasekhar@gmail.com",
   "rajasekhar.nv@gmail.com",
+  "hodds@mlrinstitutions.ac.in",
+  "hodaiml@mlrinstitutions.ac.in",
+  "hodit@mlrinstitutions.ac.in",
+  "hodcse@mlrinstitutions.ac.in",
+  "pradeep13@mlrinstitutions.ac.in",
 ]; // Replace with your admin emails
 
 export async function middleware(req: NextRequest) {

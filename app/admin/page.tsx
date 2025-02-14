@@ -8,15 +8,19 @@ import ExportButton from "@/components/ExportButton";
 import OpportunitiesAdmin from "@/components/OpportunityAdmin";
 import { Tab, Tabs } from "@heroui/react";
 import CoursesAdmin from "@/components/CoursesAdmin";
-
 const ADMIN_EMAILS = [
   "keertan.k@gmail.com",
   "admin2@example.com",
+  "siddhartht4206@gmail.com",
   "23r21a12b3@mlrit.ac.in",
   "23r21a1285@mlrit.ac.in",
-  "siddhartht4206@gmail.com",
   "nv.rajasekhar@gmail.com",
   "rajasekhar.nv@gmail.com",
+  "hodds@mlrinstitutions.ac.in",
+  "hodaiml@mlrinstitutions.ac.in",
+  "hodit@mlrinstitutions.ac.in",
+  "hodcse@mlrinstitutions.ac.in",
+  "pradeep13@mlrinstitutions.ac.in",
 ];
 
 export default function AdminPage() {

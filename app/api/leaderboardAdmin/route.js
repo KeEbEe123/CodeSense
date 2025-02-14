@@ -208,7 +208,9 @@ async function refreshLeaderboard() {
 
   // After batch update, update the ranks
   setTimeout(async () => {
-    const updatedUsers = await User.find().sort({ totalScore: -1 });
+    const updatedUsers = await User.find({ onboard: true }).sort({
+      totalScore: -1,
+    });
     for (let i = 0; i < updatedUsers.length; i++) {
       await User.findByIdAndUpdate(updatedUsers[i]._id, { rank: i + 1 });
     }
@@ -227,7 +229,7 @@ export async function POST() {
     await refreshLeaderboard();
 
     // Fetch the updated leaderboard data
-    const leaderboard = await User.find()
+    const leaderboard = await User.find({ onboard: true })
       .sort({ rank: 1 })
       .select("name email totalScore rollno department section platforms rank")
       .exec();
