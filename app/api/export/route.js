@@ -65,6 +65,11 @@ export async function GET(req) {
         CodeChefScore: platforms.codechef?.score || 0,
         GithubUsername: platforms.github?.username || 0,
         GithubCommits: platforms.github?.score || 0,
+        HackerRankUsername: platforms.hackerrank?.username || 0,
+        HackerRankScore: platforms.hackerrank?.score || 0,
+        GeeksForGeeksUsername: platforms.geeksforgeeks?.username || 0,
+        GeeksForGeeksScore: platforms.geeksforgeeks?.score || 0,
+
         // Add other platforms similarly
       };
     });

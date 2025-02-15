@@ -203,6 +203,43 @@ const ProfilePage = () => {
         <p className="text-primary text-center text-xl font-pop">
           Roll No: {user.rollno}
         </p>
+
+        <Button onPress={onOpenEditProfile}>Edit Profile</Button>
+        <Modal
+          isOpen={isEditProfileOpen}
+          placement="top-center"
+          onOpenChange={setEditProfileOpen}
+          className="bg-gradient-to-bl from-gray-800 to-background"
+          backdrop="blur"
+          hideCloseButton
+          isKeyboardDismissDisabled={true}
+          isDismissable={false}
+        >
+          <ModalContent>
+            {(onClose) => (
+              <>
+                <ModalHeader className="flex flex-col gap-1 font-pop text-offwhite text-2xl">
+                  Change Profile Details
+                </ModalHeader>
+                <ModalBody>
+                  {user && <BasicDetails onSuccess={fetchUser} user={user} />}
+                </ModalBody>
+                <ModalFooter>
+                  <Button
+                    color="danger"
+                    variant="flat"
+                    onPress={() => {
+                      onClose();
+                      fetchUser();
+                    }}
+                  >
+                    Close
+                  </Button>
+                </ModalFooter>
+              </>
+            )}
+          </ModalContent>
+        </Modal>
       </div>
 
       {/* Right Pane */}

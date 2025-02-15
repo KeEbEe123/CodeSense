@@ -1,24 +1,54 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Input, Button } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
 import { Select, SelectItem } from "@heroui/react";
 
-export const BasicDetails = ({ onSuccess }: { onSuccess: () => void }) => {
+interface User {
+  rollno?: string;
+  About?: string;
+  Contact?: string;
+  linkedIn?: string;
+  department?: string;
+  section?: string;
+  ParentContact?: string;
+  graduationYear?: string;
+}
+
+interface BasicDetailsProps {
+  onSuccess: () => void;
+  user?: User; // User details for editing
+}
+
+export const BasicDetails = ({ onSuccess, user }: BasicDetailsProps) => {
   const { data: session } = useSession();
-  const [submitted, setSubmitted] = useState<Record<
-    string,
-    FormDataEntryValue
-  > | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [selectedDepartment, setSelectedDepartment] = useState("");
-  const [selectedSection, setSelectedSection] = useState("");
-  const [selectedGraduationYear, setSelectedGraduationYear] = useState("");
-  const [department, setDepartment] = useState<string | null>(null); // ✅ CHANGED
-  const [section, setSection] = useState<string | null>(null);
-  const [graduationYear, setGraduationYear] = useState<string | null>(null);
+
+  const [rollno, setRollno] = useState(user?.rollno || "");
+  const [about, setAbout] = useState(user?.About || "");
+  const [contact, setContact] = useState(user?.Contact || "");
+  const [linkedIn, setLinkedIn] = useState(user?.linkedIn || "");
+  const [department, setDepartment] = useState(user?.department || "");
+  const [section, setSection] = useState(user?.section || "");
+  const [parentContact, setParentContact] = useState(user?.ParentContact || "");
+  const [graduationYear, setGraduationYear] = useState(
+    user?.graduationYear || ""
+  );
+
+  useEffect(() => {
+    if (user) {
+      setRollno(user.rollno || "");
+      setAbout(user.About || "");
+      setContact(user.Contact || "");
+      setLinkedIn(user.linkedIn || "");
+      setDepartment(user.department || "");
+      setSection(user.section || "");
+      setParentContact(user.ParentContact || "");
+      setGraduationYear(user.graduationYear || "");
+    }
+  }, [user]);
 
   const departments = [
     { key: "CSE", label: "CSE" },
@@ -33,54 +63,52 @@ export const BasicDetails = ({ onSuccess }: { onSuccess: () => void }) => {
     { key: "MECH", label: "MECH" },
   ];
 
-  const sections = [
-    { key: "A", label: "A" },
-    { key: "B", label: "B" },
-    { key: "C", label: "C" },
-    { key: "D", label: "D" },
-    { key: "E", label: "E" },
-    { key: "F", label: "F" },
-    { key: "G", label: "G" },
-  ];
-  const graduationYears = [
-    { key: "2025", label: "2025" },
-    { key: "2026", label: "2026" },
-    { key: "2027", label: "2027" },
-    { key: "2028", label: "2028" },
-    { key: "2029", label: "2029" },
-  ];
+  const sections = ["A", "B", "C", "D", "E", "F", "G"].map((sec) => ({
+    key: sec,
+    label: sec,
+  }));
+
+  const graduationYears = ["2025", "2026", "2027", "2028", "2029"].map(
+    (gy) => ({
+      key: gy,
+      label: gy,
+    })
+  );
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (contact.length != 10 || parentContact.length != 10) {
+      setError("Contact must be 10 Digits");
+      return;
+    }
+
     if (!department) {
-      // ✅ CHANGED
-      setError("Please select a department."); // ✅ CHANGED
-      return;
-    }
-
-    if (!section) {
-      // ✅ CHANGED
-      setError("Please select a section."); // ✅ CHANGED
+      setError("Please select a department.");
       return;
     }
     if (!section) {
-      // ✅ CHANGED
-      setError("Please select your graduation year."); // ✅ CHANGED
+      setError("Please select a section.");
+      return;
+    }
+    if (!graduationYear) {
+      setError("Please select your graduation year.");
       return;
     }
 
-    const formData = Object.fromEntries(new FormData(e.currentTarget));
     const data = {
-      ...formData,
+      rollno,
+      about,
+      contact,
+      linkedIn,
       email: session?.user?.email, // Include email from session
       department,
       section,
+      parentContact,
       graduationYear,
     };
 
     console.log("Payload being sent:", data);
-    setSubmitted(data);
     setError(null);
     setSuccess(null);
 
@@ -106,40 +134,26 @@ export const BasicDetails = ({ onSuccess }: { onSuccess: () => void }) => {
   };
 
   return (
-    <div className="p-6 bg-inherit font-pop rounded-lg max-w-lg mx-auto">
-      <Form
-        className="w-full space-y-4"
-        validationBehavior="native"
-        onSubmit={onSubmit}
-      >
+    <div className="p-6 bg-inherit font-pop rounded-lg max-w-lg mx-auto lg:min-w-80">
+      <Form className="w-full space-y-4" onSubmit={onSubmit}>
         <Input
           isRequired
-          validate={(value) => {
-            if (value.length < 10) {
-              return "Please enter your complete roll number";
-            }
-          }}
-          errorMessage="Please enter a valid roll number"
+          value={rollno}
+          onChange={(e) => setRollno(e.target.value.toUpperCase())}
           label="Roll Number"
-          labelPlacement="outside"
           name="rollno"
           placeholder="Enter your roll number"
           type="text"
-          classNames={{
-            label: "text-primary",
-            input: "text-white placeholder-white",
-          }}
         />
 
-        <div className="flex w-full space-x-4">
+        <div className="flex flex-col lg:flex-row w-full space-y-4 lg:space-y-0 lg:space-x-4">
           <Select
             label="Department"
-            placeholder="Select Department"
-            labelPlacement="outside"
-            selectedKey={selectedDepartment}
+            placeholder={department ? department : "Select department"}
+            selectedKey={department}
             onSelectionChange={(keys) =>
               setDepartment(Array.from(keys)[0] as string)
-            } // ✅ CHANGED
+            }
             isRequired
           >
             {departments.map((dept) => (
@@ -149,12 +163,11 @@ export const BasicDetails = ({ onSuccess }: { onSuccess: () => void }) => {
 
           <Select
             label="Section"
-            labelPlacement="outside"
-            placeholder="Select Section"
-            selectedKey={selectedSection}
+            placeholder={section ? section : "Select section"}
+            selectedKey={section}
             onSelectionChange={(keys) =>
               setSection(Array.from(keys)[0] as string)
-            } // ✅ CHANGED
+            }
             isRequired
           >
             {sections.map((sec) => (
@@ -162,84 +175,70 @@ export const BasicDetails = ({ onSuccess }: { onSuccess: () => void }) => {
             ))}
           </Select>
         </div>
-        <div className="mt-4 w-full">
-          <Select
-            label="Year of graduation"
-            labelPlacement="outside"
-            placeholder="Select year of graduation"
-            selectedKey={selectedGraduationYear}
-            onSelectionChange={(keys) =>
-              setGraduationYear(Array.from(keys)[0] as string)
-            } // ✅ CHANGED
-            isRequired
-          >
-            {graduationYears.map((gy) => (
-              <SelectItem key={gy.key}>{gy.label}</SelectItem>
-            ))}
-          </Select>
-        </div>
-        <div className="mt-4 w-full">
-          <Input
-            label="About"
-            labelPlacement="outside"
-            name="about"
-            placeholder="Write a short description about yourself"
-            type="text"
-            isRequired
-          />
-        </div>
-        <div className="mt-4 w-full">
-          <Input
-            isRequired
-            errorMessage="Please enter a valid contact number"
-            label="Contact"
-            labelPlacement="outside"
-            name="contact"
-            placeholder="Enter your contact number"
-            type="tel"
-            classNames={{
-              label: "text-black",
-              input: "text-white placeholder-white",
-            }}
-          />
-        </div>
-        <div className="mt-4 w-full">
-          <Input
-            isRequired
-            errorMessage="Please enter a valid contact number"
-            label="Parent's Contact"
-            labelPlacement="outside"
-            name="parentContact"
-            placeholder="Enter your parent's contact number"
-            type="tel"
-            classNames={{
-              label: "text-black",
-              input: "text-white placeholder-white",
-            }}
-          />
-        </div>
-        <div className="mt-4 w-full">
-          <Input
-            label="LinkedIn"
-            labelPlacement="outside"
-            name="linkedIn"
-            placeholder="eg: https://www.linkedin.com/in/keertan-b652b2290/"
-            type="url"
-            isRequired
-            classNames={{
-              label: "text-primary",
-              input: "text-white placeholder-white",
-            }}
-          />
-        </div>
+
+        <Select
+          label="Year of Graduation"
+          placeholder={graduationYear ? graduationYear : "Select Year"}
+          selectedKey={graduationYear}
+          onSelectionChange={(keys) =>
+            setGraduationYear(Array.from(keys)[0] as string)
+          }
+          isRequired
+        >
+          {graduationYears.map((gy) => (
+            <SelectItem key={gy.key}>{gy.label}</SelectItem>
+          ))}
+        </Select>
+
+        <Input
+          value={about}
+          onChange={(e) => setAbout(e.target.value)}
+          label="About"
+          name="about"
+          placeholder="Write a short description about yourself"
+          type="text"
+          isRequired
+        />
+
+        <Input
+          isRequired
+          value={contact}
+          onChange={(e) => setContact(e.target.value)}
+          label="Contact"
+          name="contact"
+          placeholder="Enter your contact number"
+          type="tel"
+        />
+
+        <Input
+          isRequired
+          value={parentContact}
+          onChange={(e) => setParentContact(e.target.value)}
+          label="Parent's Contact"
+          name="parentContact"
+          placeholder="Enter your parent's contact number"
+          type="tel"
+        />
+
+        <Input
+          value={linkedIn}
+          onChange={(e) => setLinkedIn(e.target.value)}
+          label="LinkedIn"
+          name="linkedIn"
+          placeholder="Enter LinkedIn URL"
+          type="url"
+          isRequired
+        />
+
         <Button
           type="submit"
           variant="bordered"
-          className="mt-4 bg-blue-500 text-red-200 hover:bg-blue-600 rounded-md px-6 py-2 w-full"
+          className="mt-4 bg-blue-500 text-white hover:bg-blue-600 rounded-md px-6 py-2 w-full"
         >
-          Submit
+          Save
         </Button>
       </Form>
+
       {error && <p className="text-red-500 mt-2">{error}</p>}
       {success && <p className="text-green-500 mt-2">{success}</p>}
     </div>

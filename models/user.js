@@ -44,6 +44,7 @@ const certificationsSchema = new Schema(
     issuer: { type: String, default: "" },
     date: { type: String, default: "" },
     description: { type: String, default: "" },
+    imageUrl: { type: String, default: "" },
   },
   { _id: false, autoIndex: false }
 );

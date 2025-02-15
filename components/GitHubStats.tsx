@@ -7,7 +7,9 @@ import { TbCheck, TbLink, TbRefresh } from "react-icons/tb";
 import { Octokit } from "octokit";
 import { Button } from "@heroui/react";
 
-const GitHubStats: React.FC = ({ onProfileLinked }) => {
+const GitHubStats: React.FC<{ onProfileLinked: (status: boolean) => void }> = ({
+  onProfileLinked,
+}) => {
   const { data: session } = useSession();
   const [username, setUsername] = useState<string>("");
   const [stats, setStats] = useState<{ commits: number } | null>(null);
@@ -38,7 +40,6 @@ const GitHubStats: React.FC = ({ onProfileLinked }) => {
         auth: process.env.NEXT_PUBLIC_GITHUB_ACCESS_TOKEN,
       });
 
-      // Fetch user repositories
       const reposResponse = await octokit.request(
         "GET /users/{username}/repos",
         {
@@ -46,15 +47,32 @@ const GitHubStats: React.FC = ({ onProfileLinked }) => {
         }
       );
 
-      if (!reposResponse || !reposResponse.data.length) {
+      console.log("GitHub Response:", reposResponse.data);
+
+      if (
+        !reposResponse ||
+        !Array.isArray(reposResponse.data) ||
+        reposResponse.data.length === 0
+      ) {
+        console.warn(
+          "No repositories found or invalid response:",
+          reposResponse.data
+        );
+
+        // **Set the stats before calling updateDatabase**
+        setStats({ commits: 0 });
+        setIcon(<TbCheck className="text-3xl text-green-600" />);
         onProfileLinked(true);
+
+        console.log("Updating database with 0 commits...");
+        await updateDatabase(0);
+
         return;
       }
 
       const repos = reposResponse.data;
       let totalCommits = 0;
 
-      // Fetch commit count for each repository
       await Promise.all(
         repos.map(async (repo: any) => {
           try {
@@ -73,37 +91,53 @@ const GitHubStats: React.FC = ({ onProfileLinked }) => {
               `Error fetching commits for ${repo.name}:`,
               commitError
             );
-            setIcon(<TbLink className="text-3xl text-white" />);
-            onProfileLinked(false);
           }
         })
       );
 
       setStats({ commits: totalCommits });
-      onProfileLinked(true);
       setIcon(<TbCheck className="text-3xl text-green-600" />);
+      onProfileLinked(true);
 
-      // Send fetched stats to MongoDB via API
+      console.log("Updating database with fetched commits:", totalCommits);
+      await updateDatabase(totalCommits);
+    } catch (err: any) {
+      console.error("Fetch Error:", err);
+
+      if (err.status === 404) {
+        setError("GitHub user not found. Please check the username.");
+      } else if (err.status === 403) {
+        setError("GitHub API rate limit exceeded. Try again later.");
+      } else {
+        setError("Error fetching GitHub stats.");
+      }
+
+      setIcon(<TbLink className="text-3xl text-white" />);
+      onProfileLinked(true);
+    }
+  };
+
+  // Function to update database
+  const updateDatabase = async (commitCount: number) => {
+    try {
       const updateResponse = await fetch("/api/update-github-stats", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: session?.user?.email,
           githubUsername: username,
-          stats: { commits: totalCommits },
+          stats: { commits: commitCount },
         }),
       });
 
       if (!updateResponse.ok) {
-        console.error("Failed to update GitHub stats in database.");
-        setError("Failed to update database.");
+        throw new Error("Failed to update GitHub stats in database.");
       }
-    } catch (err) {
-      console.error("Fetch Error:", err);
-      setError("Error fetching GitHub stats.");
-      onProfileLinked(true);
+    } catch (error) {
+      console.error("Database Update Error:", error);
     }
   };
+
   const resetInput = () => {
     setUsername("");
     setStats(null);

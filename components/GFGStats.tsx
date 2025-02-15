@@ -73,7 +73,7 @@ const GFGStats: React.FC<{ onProfileLinked: (status: boolean) => void }> = ({
       }
     } catch (err) {
       setError("Error fetching data.");
-      onProfileLinked(false);
+      onProfileLinked(true);
       setIcon(<TbLink className="text-3xl text-white" />);
     }
   };

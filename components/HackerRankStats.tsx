@@ -92,7 +92,7 @@ const HackerRankStats: React.FC<Props> = ({ onProfileLinked }) => {
     } catch (err) {
       console.error("Error fetching data:", err);
       setError("Error fetching data.");
-      onProfileLinked(false);
+      onProfileLinked(true);
       setIcon(<TbLink className="text-3xl text-white" />);
     }
   };

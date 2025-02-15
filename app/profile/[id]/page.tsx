@@ -240,12 +240,12 @@ const Profile = ({ params }: { params: { id: string } }) => {
                 </div>
                 <div className="flex items-center gap-2">
                   <p className="font-pop text-gray-400 text-xl">
-                    GitHub: {user.platforms.hackerrank.username}
+                    HackerRank: {user.platforms.hackerrank.username}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <p className="font-pop text-gray-400 text-xl">
-                    GitHub: {user.platforms.geeksforgeeks.username}
+                    GeeksForGeeks: {user.platforms.geeksforgeeks.username}
                   </p>
                 </div>
               </div>

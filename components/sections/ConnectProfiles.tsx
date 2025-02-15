@@ -17,7 +17,7 @@ const ConnectProfiles: React.FC<ConnectProfilesProps> = ({
     leetcode: false,
     codeforces: false,
     codechef: false,
-    github: false,
+    github: true,
     hackerrank: false,
     gfg: false,
   });
