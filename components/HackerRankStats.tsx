@@ -82,7 +82,7 @@ const HackerRankStats: React.FC<Props> = ({ onProfileLinked }) => {
 
         if (!updateResponse.ok) {
           console.error("Failed to update stats in the database.");
-          onProfileLinked(false);
+          onProfileLinked(true);
         }
       } else {
         setError("No such username found.");
