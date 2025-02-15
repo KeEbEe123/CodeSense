@@ -162,20 +162,22 @@ export const BasicDetails = ({ onSuccess }: { onSuccess: () => void }) => {
             ))}
           </Select>
         </div>
-        <Select
-          label="Year of graduation"
-          labelPlacement="outside"
-          placeholder="Select year of graduation"
-          selectedKey={selectedGraduationYear}
-          onSelectionChange={(keys) =>
-            setGraduationYear(Array.from(keys)[0] as string)
-          } // ✅ CHANGED
-          isRequired
-        >
-          {graduationYears.map((gy) => (
-            <SelectItem key={gy.key}>{gy.label}</SelectItem>
-          ))}
-        </Select>
+        <div className="mt-4 w-full">
+          <Select
+            label="Year of graduation"
+            labelPlacement="outside"
+            placeholder="Select year of graduation"
+            selectedKey={selectedGraduationYear}
+            onSelectionChange={(keys) =>
+              setGraduationYear(Array.from(keys)[0] as string)
+            } // ✅ CHANGED
+            isRequired
+          >
+            {graduationYears.map((gy) => (
+              <SelectItem key={gy.key}>{gy.label}</SelectItem>
+            ))}
+          </Select>
+        </div>
         <div className="mt-4 w-full">
           <Input
             label="About"
