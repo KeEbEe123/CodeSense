@@ -15,8 +15,10 @@ export const BasicDetails = ({ onSuccess }: { onSuccess: () => void }) => {
   const [success, setSuccess] = useState<string | null>(null);
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [selectedSection, setSelectedSection] = useState("");
+  const [selectedGraduationYear, setSelectedGraduationYear] = useState("");
   const [department, setDepartment] = useState<string | null>(null); // ✅ CHANGED
   const [section, setSection] = useState<string | null>(null);
+  const [graduationYear, setGraduationYear] = useState<string | null>(null);
 
   const departments = [
     { key: "CSE", label: "CSE" },
@@ -40,6 +42,13 @@ export const BasicDetails = ({ onSuccess }: { onSuccess: () => void }) => {
     { key: "F", label: "F" },
     { key: "G", label: "G" },
   ];
+  const graduationYears = [
+    { key: "2025", label: "2025" },
+    { key: "2026", label: "2026" },
+    { key: "2027", label: "2027" },
+    { key: "2028", label: "2028" },
+    { key: "2029", label: "2029" },
+  ];
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -55,6 +64,11 @@ export const BasicDetails = ({ onSuccess }: { onSuccess: () => void }) => {
       setError("Please select a section."); // ✅ CHANGED
       return;
     }
+    if (!section) {
+      // ✅ CHANGED
+      setError("Please select your graduation year."); // ✅ CHANGED
+      return;
+    }
 
     const formData = Object.fromEntries(new FormData(e.currentTarget));
     const data = {
@@ -62,6 +76,7 @@ export const BasicDetails = ({ onSuccess }: { onSuccess: () => void }) => {
       email: session?.user?.email, // Include email from session
       department,
       section,
+      graduationYear,
     };
 
     console.log("Payload being sent:", data);
@@ -147,6 +162,20 @@ export const BasicDetails = ({ onSuccess }: { onSuccess: () => void }) => {
             ))}
           </Select>
         </div>
+        <Select
+          label="Year of graduation"
+          labelPlacement="outside"
+          placeholder="Select year of graduation"
+          selectedKey={selectedGraduationYear}
+          onSelectionChange={(keys) =>
+            setGraduationYear(Array.from(keys)[0] as string)
+          } // ✅ CHANGED
+          isRequired
+        >
+          {graduationYears.map((gy) => (
+            <SelectItem key={gy.key}>{gy.label}</SelectItem>
+          ))}
+        </Select>
         <div className="mt-4 w-full">
           <Input
             label="About"
@@ -192,7 +221,7 @@ export const BasicDetails = ({ onSuccess }: { onSuccess: () => void }) => {
             label="LinkedIn"
             labelPlacement="outside"
             name="linkedIn"
-            placeholder="eg: https://www.linkedin.com/in/keertan-kuppili-b652b2290/"
+            placeholder="eg: https://www.linkedin.com/in/keertan-b652b2290/"
             type="url"
             isRequired
             classNames={{

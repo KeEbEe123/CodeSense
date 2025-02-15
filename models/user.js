@@ -58,6 +58,7 @@ const userSchema = new Schema(
     onboard: { type: Boolean, default: false },
     department: { type: String, default: "" },
     section: { type: String, default: "" },
+    graduationYear: { type: String, default: "" },
     parentContact: { type: String, default: "" },
     image: { type: String, default: null },
     totalScore: { type: Number, default: 0 }, // Total score of the user

@@ -208,7 +208,7 @@ const LeaderboardUser = () => {
                       : user.rank === 2
                       ? "bg-gray-400/70"
                       : user.rank === 3
-                      ? "bg-yellow-700/70"
+                      ? "bg-pink-500/70"
                       : user.email === userEmail
                       ? "bg-pink-600/50"
                       : ""

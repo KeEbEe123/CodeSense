@@ -70,8 +70,12 @@ async function fetchHackerrankStats(username, prevScore) {
 
 async function fetchGFGStats(username, prevScore) {
   try {
-    const response = await fetch(`/api/fetch-gfg-stats?username=${username}`);
+    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+    const response = await fetch(
+      `${baseUrl}/api/fetch-gfg-stats?username=${username}`
+    );
     const data = await response.json();
+
     return response.ok && data
       ? { score: data.score || 0 }
       : { score: prevScore };
@@ -168,13 +172,15 @@ async function updateLeaderboardBatch(users) {
         : { score: prevGFG };
 
       // Compute total score before updating
-      const totalScore =
-        codechefStats.score +
-        codeforcesStats.score +
-        leetcodeStats.score +
-        githubStats.score +
-        gfgStats.score +
-        hackerrankStats.score;
+      const totalScore = Math.round(
+        (codechefStats.score * 0.16 +
+          codeforcesStats.score * 0.16 +
+          leetcodeStats.score * 0.2 +
+          githubStats.score * 0.16 +
+          gfgStats.score * 0.16 +
+          hackerrankStats.score * 0.16) *
+          10
+      );
 
       // Now update the user in the database
       await User.findByIdAndUpdate(user._id, {

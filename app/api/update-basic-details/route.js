@@ -15,6 +15,7 @@ export async function POST(request) {
       department,
       section,
       parentContact,
+      graduationYear,
     } = await request.json();
 
     if (!email || !rollno || !contact) {
@@ -39,6 +40,7 @@ export async function POST(request) {
     user.department = department;
     user.section = section;
     user.ParentContact = parentContact;
+    user.graduationYear = graduationYear;
 
     await user.save();
 

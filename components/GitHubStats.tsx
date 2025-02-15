@@ -120,7 +120,7 @@ const GitHubStats: React.FC = ({ onProfileLinked }) => {
           fullWidth
           color="default"
           label="GitHub Username"
-          placeholder="Sidsmartz"
+          placeholder="eg: Sidsmarts"
           value={username}
           onChange={handleChange}
           classNames={{

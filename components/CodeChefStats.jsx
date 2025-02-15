@@ -81,7 +81,7 @@ const CodeChefStats = ({ onProfileLinked }) => {
           label="Enter CodeChef Username"
           value={username}
           onChange={handleChange}
-          placeholder="eg: busy_hug_73"
+          placeholder="eg: busy_hug_74"
           classNames={{
             label: "text-white",
             input: "text-white placeholder-white",
