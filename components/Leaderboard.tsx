@@ -27,8 +27,6 @@ const LeaderboardUser = () => {
     "keertan.k@gmail.com",
     "admin2@example.com",
     "siddhartht4206@gmail.com",
-    "23r21a12b3@mlrit.ac.in",
-    "23r21a1285@mlrit.ac.in",
     "nv.rajasekhar@gmail.com",
     "rajasekhar.nv@gmail.com",
     "hodds@mlrinstitutions.ac.in",
