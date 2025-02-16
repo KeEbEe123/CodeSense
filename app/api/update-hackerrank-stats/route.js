@@ -6,7 +6,7 @@ export async function POST(request) {
   try {
     const { email, hackerrankUsername, totalSolved } = await request.json();
 
-    if (!email || !hackerrankUsername || !totalSolved) {
+    if (!email || !hackerrankUsername || totalSolved === undefined) {
       return NextResponse.json(
         { message: "Missing required fields" },
         { status: 400 }
@@ -20,11 +20,6 @@ export async function POST(request) {
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
-
-    // const totalSolved = badges.reduce(
-    //   (sum, badge) => sum + (badge.solved || 0),
-    //   0
-    // );
 
     user.platforms.hackerrank.username = hackerrankUsername;
     user.platforms.hackerrank.score = totalSolved;

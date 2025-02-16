@@ -58,35 +58,40 @@ const HackerRankStats: React.FC<Props> = ({ onProfileLinked }) => {
 
       const data = await response.json();
 
-      if (data.models && Array.isArray(data.models)) {
-        const totalSolved = data.models.reduce(
+      if (!data.models || !Array.isArray(data.models)) {
+        setError("No such username found.");
+        setIcon(<TbLink className="text-3xl text-white" />);
+        onProfileLinked(false);
+        return;
+      }
+
+      let totalSolved = 0;
+      if (data.models.length > 0) {
+        totalSolved = data.models.reduce(
           (sum: number, badge: Badge) => sum + (badge.solved || 0),
           0
         );
+      }
 
-        setStats({ totalSolved, badges: data.models });
-        onProfileLinked(true);
-        setIcon(<TbCheck className="text-3xl text-green-600" />);
+      setStats({ totalSolved, badges: data.models });
+      onProfileLinked(true);
+      setIcon(<TbCheck className="text-3xl text-green-600" />);
 
-        const updateResponse = await fetch("/api/update-hackerrank-stats", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: session?.user?.email,
-            hackerrankUsername: username,
-            totalSolved: totalSolved,
-          }),
-        });
+      // Update only if there are valid stats
+      const updateResponse = await fetch("/api/update-hackerrank-stats", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: session?.user?.email,
+          hackerrankUsername: username,
+          totalSolved,
+        }),
+      });
 
-        if (!updateResponse.ok) {
-          console.error("Failed to update stats in the database.");
-          onProfileLinked(true);
-        }
-      } else {
-        setError("No such username found.");
-        setIcon(<TbLink className="text-3xl text-white" />);
+      if (!updateResponse.ok) {
+        console.error("Failed to update stats in the database.");
         onProfileLinked(false);
       }
     } catch (err) {

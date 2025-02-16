@@ -151,7 +151,7 @@ const Leaderboard = () => {
           <option value="201-300">201-300</option>
           <option value="301-400">301-400</option>
         </select>
-        <button
+        {/* <button
           onClick={fetchLeaderboard}
           disabled={loading}
           className={`px-6 py-2 rounded-lg w-full md:w-auto ${
@@ -161,7 +161,7 @@ const Leaderboard = () => {
           }`}
         >
           {loading ? "Refreshing..." : "Refresh Leaderboard"}
-        </button>
+        </button> */}
       </div>
 
       <div className="overflow-x-auto">
