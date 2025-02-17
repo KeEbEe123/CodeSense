@@ -85,25 +85,28 @@ const OpportunitiesList = () => {
         {opportunities.map((opp) => (
           <Card
             key={opp._id}
-            className="pb-2 pr-14 bg-gradient-to-bl from-gray-800 to-background w-full lg:pr-28"
+            className="pb-2 pr-14 bg-gradient-to-bl from-gray-800 to-background w-full lg:pr-8"
           >
             <CardBody className="font-pop text-offwhite">
-              <h3 className="text-lg lg:text-3xl font-semibold mb-2 pb-2 border-b-2 border-gray-600">
-                {opp.name}{" "}
-                <span className="font-thin font-pop text-md px-1">@</span>
-                {opp.company}
-              </h3>
-              <p className="text-sm sm:text-base">{opp.description}</p>
-              <p className="text-xs sm:text-sm text-gray-400">
-                Duration: {opp.lastDate}
-              </p>
-              <div className="absolute top-2 right-2">
+              <div className="flex justify-between">
+                <h3 className="text-lg lg:text-3xl font-semibold mb-2 pb-2 border-b-2 border-gray-600">
+                  {opp.name}{" "}
+                  <span className="font-thin font-pop text-md px-1">@</span>
+                  {opp.company}
+                </h3>
                 {new Date(opp.lastDate) < new Date() ? (
                   <Chip>Completed</Chip>
                 ) : (
                   <Chip>Ongoing</Chip>
                 )}
               </div>
+
+              <p className="text-sm sm:text-base">{opp.description}</p>
+              <p className="text-xs sm:text-sm text-gray-400">
+                Last date to apply:
+                <span className="text-red-600"> {opp.lastDate} </span>
+              </p>
+              {/* <div className="absolute top-2 right-2"></div> */}
               <div className="flex flex-col gap-2 mt-2">
                 <span className="font-thin font-pop text-sm px-1">
                   Eligible Departments:
