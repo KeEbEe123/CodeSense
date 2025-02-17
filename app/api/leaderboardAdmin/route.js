@@ -31,7 +31,7 @@ async function fetchCodeforcesStats(username, prevScore) {
     );
     const data = await response.json();
     return data.status === "OK"
-      ? { score: (data.result[0].rating || 0) / 20 }
+      ? { score: Math.round((data.result[0].rating || 0) / 20) }
       : { score: prevScore };
   } catch (error) {
     console.error(`Error fetching Codeforces stats for ${username}:`, error);
@@ -94,10 +94,8 @@ async function fetchGFGStats(username, prevScore) {
   }
 }
 
-
 {
   //GFG Stats route goes here
-  
 }
 
 async function fetchGitHubStats(username, prevScore) {
@@ -241,7 +239,7 @@ async function refreshLeaderboard() {
 }
 
 // Schedule Auto-Update at Midnight IST (18:30 UTC)
-cron.schedule("0 18 * * *", refreshLeaderboard, {
+cron.schedule("0 0 * * *", refreshLeaderboard, {
   timezone: "Asia/Kolkata",
 });
 

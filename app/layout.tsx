@@ -19,6 +19,7 @@ import {
   MantineProvider,
   mantineHtmlProps,
 } from "@mantine/core";
+import PatchNotes from "@/components/PatchNotes";
 
 const poppins = Poppins({
   weight: ["200", "400", "600"],
@@ -76,6 +77,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <Navbar />
               <div id="main" className="mx-auto dark">
                 <Toaster position="top-center" />
+                <PatchNotes />
                 {children}
               </div>
             </NextAuthProvider>

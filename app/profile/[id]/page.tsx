@@ -106,7 +106,7 @@ const Profile = ({ params }: { params: { id: string } }) => {
             isVertical
           >
             <Tab key="overview" title="Overview">
-              <div className="w-full mb-4">
+              <div className="w-full mb-4 hidden lg:block">
                 <GitHubCalendar username={user.platforms.github.username} />
               </div>
               <div className="flex flex-col md:flex-row sm:flex-row justify-between gap-4">

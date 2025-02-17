@@ -50,9 +50,14 @@ const CoursesList = () => {
               <p className="text-sm sm:text-base">{course.description}</p>
 
               <div className="mt-2 flex gap-4">
-                <a href={course.link} target="_blank">
-                  <Button className="text-blue-400">Enroll</Button>
-                </a>
+                <Button
+                  className="text-blue-400"
+                  onPress={() =>
+                    window.open(course.link, "_blank", "noopener,noreferrer")
+                  }
+                >
+                  Go to course
+                </Button>
               </div>
             </CardBody>
           </Card>

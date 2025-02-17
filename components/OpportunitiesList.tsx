@@ -78,70 +78,93 @@ const OpportunitiesList = () => {
     }
   };
 
+  // Sort: Move completed opportunities to the end
+  const sortedOpportunities = [...opportunities].sort((a, b) => {
+    const aCompleted = new Date(a.lastDate) < new Date();
+    const bCompleted = new Date(b.lastDate) < new Date();
+    return aCompleted === bCompleted ? 0 : aCompleted ? 1 : -1;
+  });
+
   return (
     <div className="space-y-4 p-6">
       <h2 className="text-2xl font-bold">Available Opportunities</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {opportunities.map((opp) => (
-          <Card
-            key={opp._id}
-            className="pb-2 pr-14 bg-gradient-to-bl from-gray-800 to-background w-full lg:pr-8"
-          >
-            <CardBody className="font-pop text-offwhite">
-              <div className="flex justify-between">
-                <h3 className="text-lg lg:text-3xl font-semibold mb-2 pb-2 border-b-2 border-gray-600">
-                  {opp.name}{" "}
-                  <span className="font-thin font-pop text-md px-1">@</span>
-                  {opp.company}
-                </h3>
-                {new Date(opp.lastDate) < new Date() ? (
-                  <Chip>Completed</Chip>
-                ) : (
-                  <Chip>Ongoing</Chip>
-                )}
-              </div>
+        {sortedOpportunities.map((opp) => {
+          const isCompleted = new Date(opp.lastDate) < new Date();
 
-              <p className="text-sm sm:text-base">{opp.description}</p>
-              <p className="text-xs sm:text-sm text-gray-400">
-                Last date to apply:
-                <span className="text-red-600"> {opp.lastDate} </span>
-              </p>
-              {/* <div className="absolute top-2 right-2"></div> */}
-              <div className="flex flex-col gap-2 mt-2">
-                <span className="font-thin font-pop text-sm px-1">
-                  Eligible Departments:
-                </span>
-                <div className="flex flex-wrap gap-2">
-                  {opp.departments.map((department) => (
-                    <Chip key={department}>{department}</Chip>
-                  ))}
+          return (
+            <Card
+              key={opp._id}
+              className={`pb-2 pr-14 w-full lg:pr-8 transition-opacity ${
+                isCompleted
+                  ? "opacity-50 bg-gray-900"
+                  : "bg-gradient-to-bl from-gray-800 to-background"
+              }`}
+            >
+              <CardBody className="font-pop text-offwhite">
+                <div className="flex justify-between">
+                  <h3 className="text-lg lg:text-3xl font-semibold mb-2 pb-2 border-b-2 border-gray-600">
+                    {opp.name}{" "}
+                    <span className="font-thin font-pop text-md px-1">@</span>
+                    {opp.company}
+                  </h3>
+                  {isCompleted ? (
+                    <Chip color="danger">Completed</Chip>
+                  ) : (
+                    <Chip color="success">Ongoing</Chip>
+                  )}
                 </div>
-              </div>
-              <div className="mt-2 flex gap-4">
-                <a href={opp.mainLink} target="_blank">
-                  <Button className="text-blue-400">Apply Here</Button>
-                </a>
-              </div>
-              <div className="mt-4 flex items-center gap-2">
-                <p className="font-thin font-pop text-sm">
-                  Have you applied to this opportunity?
+
+                <p className="text-sm sm:text-base">{opp.description}</p>
+                <p className="text-xs font-thin sm:text-sm text-gray-400 mt-2">
+                  Last date to apply:
+                  <span className="text-red-600"> {opp.lastDate} </span>
                 </p>
-                <Switch
-                  isSelected={opp.applied.includes(userEmail)}
-                  onChange={() => handleToggleApplied(opp)}
-                  color="danger"
-                  thumbIcon={({ isSelected }) =>
-                    isSelected ? (
-                      <TbCheck size={20} className="text-background" />
-                    ) : (
-                      <TbX size={20} className="text-background" />
-                    )
-                  }
-                />
-              </div>
-            </CardBody>
-          </Card>
-        ))}
+
+                <div className="flex flex-col gap-2 mt-2">
+                  <span className="font-thin font-pop text-sm text-gray-400">
+                    Eligible Departments:
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {opp.departments.map((department) => (
+                      <Chip key={department}>{department}</Chip>
+                    ))}
+                  </div>
+                </div>
+                <div className="mt-4 flex gap-4">
+                  <Button
+                    className="text-blue-400"
+                    onPress={() =>
+                      window.open(opp.mainLink, "_blank", "noopener,noreferrer")
+                    }
+                  >
+                    Apply Here
+                  </Button>
+                </div>
+
+                {!isCompleted && (
+                  <div className="mt-4 flex items-center gap-2">
+                    <p className="font-thin font-pop text-sm">
+                      Have you applied to this opportunity?
+                    </p>
+                    <Switch
+                      isSelected={opp.applied.includes(userEmail)}
+                      onChange={() => handleToggleApplied(opp)}
+                      color="danger"
+                      thumbIcon={({ isSelected }) =>
+                        isSelected ? (
+                          <TbCheck size={20} className="text-background" />
+                        ) : (
+                          <TbX size={20} className="text-background" />
+                        )
+                      }
+                    />
+                  </div>
+                )}
+              </CardBody>
+            </Card>
+          );
+        })}
       </div>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
