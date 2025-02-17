@@ -22,6 +22,7 @@ const LeaderboardUser = () => {
       hackerrank?: { score: number };
       geeksforgeeks?: { score: number };
     };
+    graduationYear: string;
   }
   const ADMIN_EMAILS = [
     "keertan.k@gmail.com",
@@ -185,6 +186,7 @@ const LeaderboardUser = () => {
                   { label: "GitHub", key: "githubScore" },
                   { label: "HackerRank", key: "hackerrankScore" },
                   { label: "GeeksForGeeks", key: "gfgScore" },
+                  { label: "Year", key: "graduationYear"},
                 ].map(({ label, key }) => (
                   <th
                     key={key}
@@ -253,6 +255,9 @@ const LeaderboardUser = () => {
                   </td>
                   <td className="border border-blue-600 px-4 py-2">
                     {user.platforms?.geeksforgeeks?.score ?? "-"}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.graduationYear}
                   </td>
                 </tr>
               ))}
