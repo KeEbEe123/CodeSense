@@ -58,26 +58,23 @@ const HackerRankStats: React.FC<Props> = ({ onProfileLinked }) => {
 
       const data = await response.json();
 
-      if (!data.models || !Array.isArray(data.models)) {
-        setError("No such username found.");
-        setIcon(<TbLink className="text-3xl text-white" />);
-        onProfileLinked(false);
-        return;
-      }
-
       let totalSolved = 0;
-      if (data.models.length > 0) {
+      if (data.models && Array.isArray(data.models)) {
         totalSolved = data.models.reduce(
           (sum: number, badge: Badge) => sum + (badge.solved || 0),
           0
         );
+
+        setStats({ totalSolved, badges: data.models });
+        onProfileLinked(true);
+        setIcon(<TbCheck className="text-3xl text-green-600" />);
+      } else {
+        setStats({ totalSolved, badges: [] });
+        setError("No such username found.");
+        setIcon(<TbLink className="text-3xl text-white" />);
+        onProfileLinked(false);
       }
 
-      setStats({ totalSolved, badges: data.models });
-      onProfileLinked(true);
-      setIcon(<TbCheck className="text-3xl text-green-600" />);
-
-      // Update only if there are valid stats
       const updateResponse = await fetch("/api/update-hackerrank-stats", {
         method: "POST",
         headers: {
@@ -86,13 +83,13 @@ const HackerRankStats: React.FC<Props> = ({ onProfileLinked }) => {
         body: JSON.stringify({
           email: session?.user?.email,
           hackerrankUsername: username,
-          totalSolved,
+          totalSolved: totalSolved,
         }),
       });
 
       if (!updateResponse.ok) {
         console.error("Failed to update stats in the database.");
-        onProfileLinked(false);
+        onProfileLinked(true);
       }
     } catch (err) {
       console.error("Error fetching data:", err);

@@ -22,13 +22,12 @@ const LeaderboardUser = () => {
       hackerrank?: { score: number };
       geeksforgeeks?: { score: number };
     };
+    graduationYear: string;
   }
   const ADMIN_EMAILS = [
     "keertan.k@gmail.com",
     "admin2@example.com",
     "siddhartht4206@gmail.com",
-    "23r21a12b3@mlrit.ac.in",
-    "23r21a1285@mlrit.ac.in",
     "nv.rajasekhar@gmail.com",
     "rajasekhar.nv@gmail.com",
     "hodds@mlrinstitutions.ac.in",
@@ -187,6 +186,7 @@ const LeaderboardUser = () => {
                   { label: "GitHub", key: "githubScore" },
                   { label: "HackerRank", key: "hackerrankScore" },
                   { label: "GeeksForGeeks", key: "gfgScore" },
+                  { label: "Year", key: "graduationYear"},
                 ].map(({ label, key }) => (
                   <th
                     key={key}
@@ -255,6 +255,9 @@ const LeaderboardUser = () => {
                   </td>
                   <td className="border border-blue-600 px-4 py-2">
                     {user.platforms?.geeksforgeeks?.score ?? "-"}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.graduationYear}
                   </td>
                 </tr>
               ))}

@@ -10,7 +10,7 @@ export async function GET() {
       onboard: true,
     })
       .sort({ rank: 1 })
-      .select("name email totalScore rank platforms rollno department section")
+      .select("name email totalScore rank platforms rollno department section graduationYear")
       .exec();
 
     return NextResponse.json(leaderboard, { status: 200 });
