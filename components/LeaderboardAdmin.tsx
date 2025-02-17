@@ -183,6 +183,9 @@ const Leaderboard = () => {
                   { label: "CodeChef", key: "platforms.codechef.score" },
                   { label: "CodeForces", key: "platforms.codeforces.score" },
                   { label: "GitHub", key: "platforms.github.score" },
+                  { label: "HackerRank", key: "platforms.hackerrank.score" },
+                  { label: "GeeksforGeeks", key: "platforms.geeksforgeeks.score" },
+                  { label: "Year", key: "graduationYear"},
                 ].map(({ label, key }) => (
                   <th
                     key={key}
@@ -232,6 +235,15 @@ const Leaderboard = () => {
                   </td>
                   <td className="border border-blue-600 px-4 py-2">
                     {user.platforms?.github?.score ?? 0}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.platforms?.hackerrank?.score ?? 0}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.platforms?.geeksforgeeks?.score?? 0}
+                  </td>
+                  <td className="border border-blue-600 px-4 py-2">
+                    {user.graduationYear || "-"}
                   </td>
                 </tr>
               ))}
