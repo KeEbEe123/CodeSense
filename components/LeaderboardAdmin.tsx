@@ -27,21 +27,11 @@ const Leaderboard = () => {
     "hodcse@mlrinstitutions.ac.in",
     "pradeep13@mlrinstitutions.ac.in",
   ];
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const now = new Date();
-      if (now.getHours() === 16 && now.getMinutes() === 21) {
-        fetchLeaderboard();
-      }
-    }, 60000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   const fetchLeaderboard = async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/leaderboardAdmin", { method: "POST" });
+      const response = await fetch("/api/leaderboard");
       const data = await response.json();
       if (Array.isArray(data)) {
         setLeaderboard(data);
@@ -55,6 +45,10 @@ const Leaderboard = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchLeaderboard();
+  }, []);
 
   const handleRowClick = (id) => {
     router.push(`/profile/${id}`);
@@ -149,7 +143,7 @@ const Leaderboard = () => {
           <option value="201-300">201-300</option>
           <option value="301-400">301-400</option>
         </select>
-        <button
+        {/* <button
           onClick={fetchLeaderboard}
           disabled={loading}
           className={`px-6 py-2 rounded-lg w-full md:w-auto ${
@@ -159,7 +153,7 @@ const Leaderboard = () => {
           }`}
         >
           {loading ? "Refreshing..." : "Refresh Leaderboard"}
-        </button>
+        </button> */}
       </div>
 
       <div className="overflow-x-auto">
@@ -184,8 +178,11 @@ const Leaderboard = () => {
                   { label: "CodeForces", key: "platforms.codeforces.score" },
                   { label: "GitHub", key: "platforms.github.score" },
                   { label: "HackerRank", key: "platforms.hackerrank.score" },
-                  { label: "GeeksforGeeks", key: "platforms.geeksforgeeks.score" },
-                  { label: "Year", key: "graduationYear"},
+                  {
+                    label: "GeeksforGeeks",
+                    key: "platforms.geeksforgeeks.score",
+                  },
+                  { label: "Year", key: "graduationYear" },
                 ].map(({ label, key }) => (
                   <th
                     key={key}
@@ -240,7 +237,7 @@ const Leaderboard = () => {
                     {user.platforms?.hackerrank?.score ?? 0}
                   </td>
                   <td className="border border-blue-600 px-4 py-2">
-                    {user.platforms?.geeksforgeeks?.score?? 0}
+                    {user.platforms?.geeksforgeeks?.score ?? 0}
                   </td>
                   <td className="border border-blue-600 px-4 py-2">
                     {user.graduationYear || "-"}
