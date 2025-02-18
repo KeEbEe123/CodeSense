@@ -7,7 +7,7 @@ import User from "@/models/user";
 import { BasicDetails } from "@/components/sections/BasicDetails";
 import CertificationForm from "@/components/CertificationForm";
 import ConnectProfiles from "@/components/sections/ConnectProfiles";
-import { Tabs, Tab, Image, Card, CardBody } from "@heroui/react";
+import { Tabs, Tab, Card, CardBody } from "@heroui/react";
 import FriendDetails from "@/components/FriendDetails";
 import CircleChartCard from "@/components/CircleChartCard";
 import axios from "axios";
@@ -41,6 +41,7 @@ import GitHubStatsNP from "@/components/GitHubStatsNP";
 import { Skeleton } from "@nextui-org/react";
 import GFGStatsNP from "@/components/GFGStatsNP";
 import GitHubCalendar from "react-github-calendar";
+import Image from "next/image";
 
 const ProfilePage = () => {
   const { status, data: session } = useSession();
@@ -375,8 +376,8 @@ const ProfilePage = () => {
                       className="pb-2 pr-14 bg-gradient-to-bl from-gray-800 to-background w-full lg:pr-28"
                       key={index}
                     >
-                      <img
-                        src={certification.image} // Dynamically set the image URL
+                      <Image
+                        src={certification.imageUrl} // Dynamically set the image URL
                         alt={certification.name} // Provide an alt description
                         className="w-full h-40 object-cover rounded-t-lg" // Adjust styling
                         width={300} // Set appropriate width
