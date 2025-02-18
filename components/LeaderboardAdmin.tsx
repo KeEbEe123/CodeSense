@@ -198,7 +198,18 @@ const Leaderboard = () => {
               {filteredLeaderboard.map((user) => (
                 <tr
                   key={user._id}
-                  className="hover:bg-[#3a3a3a] transition-all cursor-pointer"
+                  className={`hover:bg-[#3a3a3a] transition-all cursor-pointer ${
+                    user.rank === 1
+                      ? "bg-yellow-500/70"
+                      : user.rank === 2
+                      ? "bg-gray-400/70"
+                      : user.rank === 3
+                      ? "bg-pink-500/70"
+                      : user.email === userEmail
+                      ? "bg-pink-600/50"
+                      : ""
+                  }`}
+                  onClick={() => handleRowClick(user._id)}
                 >
                   <td className="border border-blue-600 px-4 py-2">
                     {user.rank ?? 0}

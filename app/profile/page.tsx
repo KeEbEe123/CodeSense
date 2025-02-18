@@ -375,6 +375,13 @@ const ProfilePage = () => {
                       className="pb-2 pr-14 bg-gradient-to-bl from-gray-800 to-background w-full lg:pr-28"
                       key={index}
                     >
+                      <Image
+                        src={certification.image} // Dynamically set the image URL
+                        alt={certification.name} // Provide an alt description
+                        className="w-full h-40 object-cover rounded-t-lg" // Adjust styling
+                        width={300} // Set appropriate width
+                        height={200} // Set appropriate height
+                      />
                       <CardBody className="text-offwhite font-pop">
                         <h3 className="text-md sm:text-xl font-semibold mb-2">
                           {certification.name}
