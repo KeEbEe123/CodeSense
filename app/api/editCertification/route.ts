@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { MongoClient } from "mongodb";
 import fs from "fs/promises";
 import path from "path";
-
+import multer from "multer";
 import { NextRequest } from "next/server";
 
 // MongoDB Connection
@@ -21,6 +21,13 @@ async function connectToDatabase() {
 const UPLOADS_DIR = "/home/certifications/uploads";
 
 // Multer storage config
+const storage = multer.diskStorage({
+  destination: UPLOADS_DIR,
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+const upload = multer({ storage });
 
 // API Route to Edit a Certification
 export async function PUT(request: NextRequest) {
