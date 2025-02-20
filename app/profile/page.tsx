@@ -19,7 +19,7 @@ import {
   px,
 } from "@mantine/core";
 import FriendsPage from "../friends/page";
-import { TbPencil, TbX } from "react-icons/tb";
+import { TbPencil } from "react-icons/tb";
 import {
   Modal,
   ModalContent,
@@ -57,34 +57,6 @@ const ProfilePage = () => {
   const [isGFGOpen, setGFGOpen] = useState(false);
   const [isHackerrankOpen, setHackerrankOpen] = useState(false);
   const [isEditProfileOpen, setEditProfileOpen] = useState(false);
-  const [isEditCertificateOpen, setEditCertificateOpen] = useState(false);
-  const [selectedCertification, setSelectedCertification] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-
-  const handleDeleteCertification = async (name: string, issuer: string) => {
-    try {
-      const response = await fetch("/api/removeCertification", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.email, name, issuer }),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        alert("Certification deleted successfully!");
-        // Optionally update state to remove the certification from UI
-        setCertifications((prev) =>
-          prev.filter((cert) => cert.name !== name || cert.issuer !== issuer)
-        );
-        fetchUser();
-      } else {
-        alert(data.message);
-      }
-    } catch (error) {
-      console.error("Error deleting certification:", error);
-      alert("Failed to delete certification.");
-    }
-  };
 
   const BASE_HEIGHT = 360;
   const getSubHeight = (children: number, spacing: number) =>
@@ -128,11 +100,6 @@ const ProfilePage = () => {
   const onOpenEditProfile = () => setEditProfileOpen(true);
   const onCloseEditProfile = () => {
     setEditProfileOpen(false);
-    fetchUser();
-  };
-  const onOpenEditCertificate = () => setEditCertificateOpen(true);
-  const onCloseEditCertificate = () => {
-    setEditCertificateOpen(false);
     fetchUser();
   };
 
@@ -263,7 +230,7 @@ const ProfilePage = () => {
                     color="danger"
                     variant="flat"
                     onPress={() => {
-                      onCloseEditProfile();
+                      onClose();
                       fetchUser();
                     }}
                   >
@@ -326,7 +293,7 @@ const ProfilePage = () => {
                   user.internships.map((internship, index) => (
                     <Card
                       key={index}
-                      className="pb-2 pr-14 bg-gradient-to-bl from-gray-800 to-background w-full lg:pr-28 min-w-48"
+                      className="pb-2 pr-14 bg-gradient-to-bl from-gray-800 to-background w-full lg:pr-28"
                     >
                       <CardBody className="font-pop text-offwhite">
                         <h3 className="text-lg sm:text-2xl font-semibold">
@@ -402,92 +369,27 @@ const ProfilePage = () => {
                     </Button>
                   </CardBody>
                 </Card>
-
                 {Array.isArray(user.certifications) &&
                 user.certifications.length > 0 ? (
                   user.certifications.map((certification, index) => (
                     <Card
+                      className="pb-2 pr-14 bg-gradient-to-bl from-gray-800 to-background w-full lg:pr-28"
                       key={index}
-                      className="group relative pb-2 pr-14 bg-gradient-to-bl from-gray-800 to-background w-full lg:pr-28 overflow-hidden min-w-48"
                     >
                       <div className="flex flex-col">
-                        {/* Image */}
-                        <div className="mb-60">
+                        {/* <div className="mb-40">
                           <Image
-                            src={certification.imageUrl}
-                            alt={certification.name}
-                            className="w-full h-40 object-cover rounded"
+                            src={certification.imageUrl} // Dynamically set the image URL
+                            alt={certification.name} // Provide an alt description
+                            className="w-full h-40 object-cover rounded" // Adjust styling
                             fill={true}
                           />
-                        </div>
-
-                        {/* CardBody hidden by default and shown on hover */}
-                        <CardBody className="absolute inset-0 bg-gray-900 bg-opacity-90 p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center text-offwhite font-pop">
-                          <div className="absolute top-2 right-2 flex gap-2">
-                            <button
-                              onClick={() => {
-                                setSelectedCertification(certification);
-                                onOpenEditCertificate();
-                              }}
-                            >
-                              <TbPencil className="text-primary text-3xl bg-cyan-600/70 rounded-full p-1 hover:cursor-pointer" />
-                            </button>
-                            <Modal
-                              isOpen={isEditCertificateOpen}
-                              placement="top-center"
-                              onOpenChange={onOpenChange}
-                              className="bg-gradient-to-bl from-gray-800 to-background"
-                              backdrop="blur"
-                              hideCloseButton
-                              isKeyboardDismissDisabled={true}
-                              isDismissable={false}
-                            >
-                              <ModalContent>
-                                {(onClose) => (
-                                  <>
-                                    <ModalHeader className="flex flex-col gap-1 font-pop text-offwhite text-2xl">
-                                      Edit Certificate
-                                    </ModalHeader>
-                                    <ModalBody>
-                                      <CertificationForm
-                                        userId={user.email}
-                                        onAdd={handleAddCertification}
-                                        certificationToEdit={
-                                          selectedCertification
-                                        }
-                                      />
-                                    </ModalBody>
-                                    <ModalFooter>
-                                      <Button
-                                        color="success"
-                                        variant="flat"
-                                        onPress={() => {
-                                          onCloseEditCertificate();
-                                          fetchUser();
-                                        }}
-                                      >
-                                        Save
-                                      </Button>
-                                    </ModalFooter>
-                                  </>
-                                )}
-                              </ModalContent>
-                            </Modal>
-                            <button
-                              onClick={() =>
-                                handleDeleteCertification(
-                                  certification.name,
-                                  certification.issuer
-                                )
-                              }
-                            >
-                              <TbX className="text-red-600 text-3xl bg-red-600/70 rounded-full p-1 hover:cursor-pointer" />
-                            </button>
-                          </div>
+                        </div> */}
+                        <CardBody className="text-offwhite font-pop mt-4 ">
                           <h3 className="text-md sm:text-xl font-semibold mb-2">
                             {certification.name}
                           </h3>
-                          <p className="text-xs sm:text-sm text-gray-300">
+                          <p className="text-xs sm:text-sm text-gray-600">
                             {certification.description}
                           </p>
                           <p className="text-xs sm:text-sm text-gray-400">
