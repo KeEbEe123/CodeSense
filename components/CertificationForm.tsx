@@ -5,40 +5,56 @@ import axios from "axios";
 import { useSession } from "next-auth/react";
 import { Input } from "@heroui/react";
 import { DatePicker, Button } from "@heroui/react";
+
 interface CertificationFormProps {
   userId: string;
-
   onAdd: (certification: any) => void;
 }
 
 const CertificationForm: React.FC<CertificationFormProps> = ({
   userId,
   onAdd,
-}: {
-  userId: string;
-  onAdd: (cert: any) => void;
 }) => {
   const [name, setName] = useState("");
   const [issuer, setIssuer] = useState("");
   const [date, setDate] = useState("");
   const [description, setDescription] = useState("");
+  const [image, setImage] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const { status, data: session } = useSession();
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        setError("Image size must be less than 2MB");
+        return;
+      }
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
 
   const handleAddCertification = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setSuccess("");
     setError("");
-    const newCertification = { name, issuer, date };
-    onAdd(newCertification);
+
     userId = session?.user?.email || "";
+    const formData = new FormData();
+    formData.append("userId", userId);
+    formData.append("name", name);
+    formData.append("issuer", issuer);
+    formData.append("date", date);
+    if (image) formData.append("image", image);
+
     try {
-      const response = await axios.post("/api/addCertification/", {
-        userId,
-        certification: { name, issuer, date },
+      const response = await axios.post("/api/addCertification/", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
       setSuccess("Certification added successfully!");
@@ -46,6 +62,8 @@ const CertificationForm: React.FC<CertificationFormProps> = ({
       setIssuer("");
       setDate("");
       setDescription("");
+      setImage(null);
+      setPreview(null);
     } catch (err: any) {
       setError(err.response?.data?.message || "An error occurred.");
     } finally {
@@ -55,81 +73,77 @@ const CertificationForm: React.FC<CertificationFormProps> = ({
 
   return (
     <div className="bg-transparent bg-gradient-to-bl from-gray-800 to-background p-4 rounded-xl font-pop space-y-4">
-      <div>
-        {/* <h2 className="text-xl font-semibold mb-4">Add Certification</h2> */}
-        <form onSubmit={handleAddCertification} className="space-y-4">
-          <div className="py-2 text-white">
-            {/* <label className="block text-sm font-medium">Title</label> */}
-            <Input
-              classNames={{
-                label: "text-white",
-                input: "text-white placeholder-white",
-              }}
-              label="Enter certification name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              isRequired
-              variant="underlined"
+      <form onSubmit={handleAddCertification} className="space-y-4">
+        <div className="py-2 text-white">
+          <Input
+            classNames={{
+              label: "text-white",
+              input: "text-white placeholder-white",
+            }}
+            label="Enter certification name"
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            isRequired
+            variant="underlined"
+          />
+        </div>
+        <div className="py-2 text-white">
+          <Input
+            classNames={{
+              label: "text-white",
+              input: "text-white placeholder-white",
+            }}
+            label="Enter issuer name"
+            type="text"
+            value={issuer}
+            onChange={(e) => setIssuer(e.target.value)}
+            isRequired
+            variant="underlined"
+          />
+        </div>
+        <div className="py-2">
+          <DatePicker
+            variant="underlined"
+            label="Date of Issue"
+            onChange={(date) => setDate(date?.toString() || "")}
+            isRequired
+            classNames={{
+              label: "text-white",
+              input: "text-white placeholder-white",
+            }}
+          />
+        </div>
+        <div className="py-2">
+          <label className="text-white block mb-2">
+            Upload Certificate Image
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="text-white"
+          />
+          {preview && (
+            <img
+              src={preview}
+              alt="Preview"
+              className="mt-2 w-32 h-32 object-cover rounded"
             />
-          </div>
-          <div className="py-2 text-white">
-            <Input
-              classNames={{
-                label: "text-white",
-                input: "text-white placeholder-white",
-              }}
-              label="Enter issuer name"
-              type="text"
-              value={issuer}
-              onChange={(e) => setIssuer(e.target.value)}
-              isRequired
-              variant="underlined"
-            />
-          </div>
-          <div className="py-2">
-            <DatePicker
-              variant="underlined"
-              label="Date of Issue"
-              onChange={(date) => setDate(date?.toString() || "")}
-              isRequired
-              classNames={{
-                label: "text-white",
-                input: "text-white placeholder-white",
-              }}
-            />
-            {/* <input
-              type="text"
-              className="w-full border rounded p-2"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              required
-            /> */}
-          </div>
-          <Button
-            type="submit"
-            className="bg-primary text-lg text-background px-4 py-2 rounded hover:rounded-full shadow-glow hover:bg-primary/80 mt-4 transition-all duration-300"
-            disabled={loading}
-          >
-            {loading ? "Adding..." : "Add Certification"}
-          </Button>
-        </form>
-        {success && <p className="text-green-500 mt-4">{success}</p>}
-        {error && <p className="text-red-500 mt-4">{error}</p>}
-      </div>
+          )}
+        </div>
+        <Button
+          type="submit"
+          className="bg-primary text-lg text-background px-4 py-2 rounded hover:rounded-full shadow-glow hover:bg-primary/80 mt-4 transition-all duration-300"
+          disabled={loading}
+        >
+          {loading ? "Adding..." : "Add Certification"}
+        </Button>
+      </form>
+      {success && <p className="text-green-500 mt-4">{success}</p>}
+      {error && <p className="text-red-500 mt-4">{error}</p>}
     </div>
   );
-  const checkCertificationExists = async (name: string, issuer: string) => {
-    try {
-      const response = await axios.post("/api/checkCertificationExists", {
-        name,
-        issuer,
-      });
-      return response.data.exists; // Assuming your API returns { exists: true/false }
-    } catch (err) {
-      return false; // In case of an error, assume it doesn't exist
-    }
-  };
 };
 
 export default CertificationForm;

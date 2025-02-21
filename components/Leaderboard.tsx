@@ -41,7 +41,11 @@ const LeaderboardUser = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [range, setRange] = useState({ start: 1, end: 50 });
 
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+  const [sortConfig, setSortConfig] = useState({
+    key: null,
+    direction: "asc",
+    secondaryKey: null, // To keep track of independent sorting
+  });
 
   const { status, data: session } = useSession();
   const userEmail = session?.user?.email;
@@ -82,14 +86,51 @@ const LeaderboardUser = () => {
 
   const handleSort = (key) => {
     let direction = "asc";
+
     if (sortConfig.key === key && sortConfig.direction === "asc") {
       direction = "desc";
     }
-    setSortConfig({ key, direction });
+
+    setSortConfig((prevConfig) => {
+      if (key === "department" || key === "section") {
+        return {
+          key,
+          direction,
+          secondaryKey:
+            prevConfig.secondaryKey === key ? null : prevConfig.secondaryKey,
+        };
+      }
+      return { key, direction, secondaryKey: null };
+    });
   };
 
   const sortedLeaderboard = [...leaderboard].sort((a, b) => {
     if (!sortConfig.key) return 0;
+
+    if (sortConfig.key === "department" || sortConfig.key === "section") {
+      const primarySort = a[sortConfig.key].localeCompare(b[sortConfig.key]);
+      if (primarySort !== 0) {
+        return sortConfig.direction === "desc" ? primarySort : -primarySort;
+      }
+
+      // Secondary sorting: If department is sorted, keep section in the same order
+      if (
+        sortConfig.key === "department" &&
+        sortConfig.secondaryKey !== "section"
+      ) {
+        const secSort = a.section.localeCompare(b.section);
+        return sortConfig.direction === "asc" ? secSort : -secSort;
+      }
+
+      if (
+        sortConfig.key === "section" &&
+        sortConfig.secondaryKey !== "department"
+      ) {
+        const depSort = a.department.localeCompare(b.department);
+        return sortConfig.direction === "asc" ? depSort : -depSort;
+      }
+    }
+
     const getValue = (user, key) => {
       if (
         [
@@ -101,10 +142,10 @@ const LeaderboardUser = () => {
           "gfgScore",
         ].includes(key)
       ) {
-        const platformKey = key.replace("Score", ""); // Extract platform name
-        return user.platforms[platformKey]?.score || 0; // Default to 0 if undefined
+        const platformKey = key.replace("Score", "");
+        return user.platforms[platformKey]?.score || 0;
       }
-      return user[key]; // For other keys like name, email, etc.
+      return user[key];
     };
 
     const aValue = getValue(a, sortConfig.key);
@@ -112,12 +153,12 @@ const LeaderboardUser = () => {
 
     if (typeof aValue === "string") {
       return sortConfig.direction === "asc"
-        ? (aValue as string).localeCompare(bValue as string)
-        : (bValue as string).localeCompare(aValue as string);
+        ? aValue.localeCompare(bValue)
+        : bValue.localeCompare(aValue);
     }
+
     return sortConfig.direction === "asc" ? aValue - bValue : bValue - aValue;
   });
-
   // Ensure users with no rank are at the bottom
   const filteredLeaderboard = sortedLeaderboard
     .filter((user) => !ADMIN_EMAILS.includes(user.email)) // Exclude admin emails
@@ -186,7 +227,7 @@ const LeaderboardUser = () => {
                   { label: "GitHub", key: "githubScore" },
                   { label: "HackerRank", key: "hackerrankScore" },
                   { label: "GeeksForGeeks", key: "gfgScore" },
-                  { label: "Year", key: "graduationYear"},
+                  { label: "Year", key: "graduationYear" },
                 ].map(({ label, key }) => (
                   <th
                     key={key}

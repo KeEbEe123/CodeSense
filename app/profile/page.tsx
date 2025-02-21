@@ -7,7 +7,7 @@ import User from "@/models/user";
 import { BasicDetails } from "@/components/sections/BasicDetails";
 import CertificationForm from "@/components/CertificationForm";
 import ConnectProfiles from "@/components/sections/ConnectProfiles";
-import { Tabs, Tab, Image, Card, CardBody } from "@heroui/react";
+import { Tabs, Tab, Card, CardBody } from "@heroui/react";
 import FriendDetails from "@/components/FriendDetails";
 import CircleChartCard from "@/components/CircleChartCard";
 import axios from "axios";
@@ -41,6 +41,7 @@ import GitHubStatsNP from "@/components/GitHubStatsNP";
 import { Skeleton } from "@nextui-org/react";
 import GFGStatsNP from "@/components/GFGStatsNP";
 import GitHubCalendar from "react-github-calendar";
+import Image from "next/image";
 
 const ProfilePage = () => {
   const { status, data: session } = useSession();
@@ -250,8 +251,8 @@ const ProfilePage = () => {
             aria-label="Profile Details"
             color={"danger"}
             variant={"light"}
-            isVertical
             className="font-koulen"
+            isVertical={window.innerWidth < 400}
           >
             <Tab key="overview" title="Overview">
               <div className="lg:w-full lg:mb-4 hidden lg:block">
@@ -375,20 +376,30 @@ const ProfilePage = () => {
                       className="pb-2 pr-14 bg-gradient-to-bl from-gray-800 to-background w-full lg:pr-28"
                       key={index}
                     >
-                      <CardBody className="text-offwhite font-pop">
-                        <h3 className="text-md sm:text-xl font-semibold mb-2">
-                          {certification.name}
-                        </h3>
-                        <p className="text-xs sm:text-sm text-gray-600">
-                          {certification.description}
-                        </p>
-                        <p className="text-xs sm:text-sm text-gray-400">
-                          Issued by: {certification.issuer}
-                        </p>
-                        <p className="text-xs sm:text-sm text-gray-400">
-                          Date: {certification.date}
-                        </p>
-                      </CardBody>
+                      <div className="flex flex-col">
+                        {/* <div className="mb-40">
+                          <Image
+                            src={certification.imageUrl} // Dynamically set the image URL
+                            alt={certification.name} // Provide an alt description
+                            className="w-full h-40 object-cover rounded" // Adjust styling
+                            fill={true}
+                          />
+                        </div> */}
+                        <CardBody className="text-offwhite font-pop mt-4 ">
+                          <h3 className="text-md sm:text-xl font-semibold mb-2">
+                            {certification.name}
+                          </h3>
+                          <p className="text-xs sm:text-sm text-gray-600">
+                            {certification.description}
+                          </p>
+                          <p className="text-xs sm:text-sm text-gray-400">
+                            Issued by: {certification.issuer}
+                          </p>
+                          <p className="text-xs sm:text-sm text-gray-400">
+                            Date: {certification.date}
+                          </p>
+                        </CardBody>
+                      </div>
                     </Card>
                   ))
                 ) : (
