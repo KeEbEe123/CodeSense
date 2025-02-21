@@ -3,10 +3,6 @@ import { connectMongoDB } from "../../../lib/mongodb";
 import User from "../../../models/user";
 import { Octokit } from "octokit";
 import cron from "node-cron";
-import {
-  fetchDirectProfileData,
-  fetchNewProfileData,
-} from "../../../utils/gfgfetcher";
 
 // Fetching Data Functions
 async function fetchCodeChefStats(username, prevScore) {
@@ -31,7 +27,7 @@ async function fetchCodeforcesStats(username, prevScore) {
     );
     const data = await response.json();
     return data.status === "OK"
-      ? { score: Math.round((data.result[0].rating || 0) / 20) }
+      ? { score: (data.result[0].rating || 0) / 20 }
       : { score: prevScore };
   } catch (error) {
     console.error(`Error fetching Codeforces stats for ${username}:`, error);
@@ -74,28 +70,25 @@ async function fetchHackerrankStats(username, prevScore) {
 
 async function fetchGFGStats(username, prevScore) {
   try {
-    if (!username) {
-      return { error: "Username is required", status: 400 };
-    }
+    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+    const response = await fetch(
+      `${baseUrl}/api/fetch-gfg-stats?username=${username}`
+    );
+    const data = await response.json();
 
-    let data = await fetchDirectProfileData(username);
-    if (!data) {
-      data = await fetchNewProfileData(username); // Fallback if direct API fails
-    }
-
-    if (!data) {
-      return { error: "User not found or no stats available", status: 404 };
-    }
-
-    return { score: data.total_problems_solved || prevScore };
+    return response.ok && data
+      ? { score: data.score || 0 }
+      : { score: prevScore };
   } catch (error) {
-    console.error("Error fetching GFG stats:", error);
-    return { error: "Internal server error", status: 500 };
+    console.error(`Error fetching GFG stats for ${username}:`, error);
+    return { score: prevScore };
   }
 }
 
+
 {
   //GFG Stats route goes here
+  
 }
 
 async function fetchGitHubStats(username, prevScore) {
@@ -140,8 +133,6 @@ async function fetchGitHubStats(username, prevScore) {
 // Batch Update Function
 async function updateLeaderboardBatch(users) {
   for (const user of users) {
-    if (!user.onboard) continue;
-
     try {
       const prevCodechef = user.platforms.codechef?.score || 0;
       const prevCodeforces = user.platforms.codeforces?.score || 0;
@@ -239,7 +230,7 @@ async function refreshLeaderboard() {
 }
 
 // Schedule Auto-Update at Midnight IST (18:30 UTC)
-cron.schedule("0 0 * * *", refreshLeaderboard, {
+cron.schedule("0 18 * * *", refreshLeaderboard, {
   timezone: "Asia/Kolkata",
 });
 

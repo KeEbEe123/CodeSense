@@ -107,30 +107,6 @@ const LeaderboardUser = () => {
   const sortedLeaderboard = [...leaderboard].sort((a, b) => {
     if (!sortConfig.key) return 0;
 
-    if (sortConfig.key === "department" || sortConfig.key === "section") {
-      const primarySort = a[sortConfig.key].localeCompare(b[sortConfig.key]);
-      if (primarySort !== 0) {
-        return sortConfig.direction === "desc" ? primarySort : -primarySort;
-      }
-
-      // Secondary sorting: If department is sorted, keep section in the same order
-      if (
-        sortConfig.key === "department" &&
-        sortConfig.secondaryKey !== "section"
-      ) {
-        const secSort = a.section.localeCompare(b.section);
-        return sortConfig.direction === "asc" ? secSort : -secSort;
-      }
-
-      if (
-        sortConfig.key === "section" &&
-        sortConfig.secondaryKey !== "department"
-      ) {
-        const depSort = a.department.localeCompare(b.department);
-        return sortConfig.direction === "asc" ? depSort : -depSort;
-      }
-    }
-
     const getValue = (user, key) => {
       if (
         [
@@ -147,6 +123,19 @@ const LeaderboardUser = () => {
       }
       return user[key];
     };
+
+    if (sortConfig.key === "departmentAndSection") {
+      const departmentComparison = a.department.localeCompare(b.department);
+      if (departmentComparison !== 0) {
+        return sortConfig.direction === "asc"
+          ? departmentComparison
+          : -departmentComparison;
+      }
+      const sectionComparison = a.section.localeCompare(b.section);
+      return sortConfig.direction === "asc"
+        ? sectionComparison
+        : -sectionComparison;
+    }
 
     const aValue = getValue(a, sortConfig.key);
     const bValue = getValue(b, sortConfig.key);
@@ -213,8 +202,7 @@ const LeaderboardUser = () => {
           <table className="w-full border-collapse border border-blue-600 shadow-lg rounded-lg">
             <thead className="bg-[#333333] text-blue-500">
               <tr>
-                {[
-                  { label: "Rank", key: "rank" },
+                {[{ label: "Rank", key: "rank" },
                   { label: "Name", key: "name" },
                   { label: "Email", key: "email" },
                   { label: "Roll No", key: "rollno" },
@@ -228,6 +216,7 @@ const LeaderboardUser = () => {
                   { label: "HackerRank", key: "hackerrankScore" },
                   { label: "GeeksForGeeks", key: "gfgScore" },
                   { label: "Year", key: "graduationYear" },
+                  { label: "Department & Section", key: "departmentAndSection" }
                 ].map(({ label, key }) => (
                   <th
                     key={key}
