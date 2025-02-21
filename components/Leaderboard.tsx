@@ -39,7 +39,8 @@ const LeaderboardUser = () => {
   const [leaderboard, setLeaderboard] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [range, setRange] = useState({ start: 1, end: 50 });
+  const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [selectedSection, setSelectedSection] = useState("");
 
   const [sortConfig, setSortConfig] = useState({
     key: null,
@@ -79,11 +80,6 @@ const LeaderboardUser = () => {
     setSearchQuery(e.target.value);
   };
 
-  const handleRangeChange = (e) => {
-    const [start, end] = e.target.value.split("-").map(Number);
-    setRange({ start, end });
-  };
-
   const handleSort = (key) => {
     let direction = "asc";
 
@@ -102,6 +98,14 @@ const LeaderboardUser = () => {
       }
       return { key, direction, secondaryKey: null };
     });
+  };
+
+  const handleDepartmentChange = (e) => {
+    setSelectedDepartment(e.target.value);
+  };
+
+  const handleSectionChange = (e) => {
+    setSelectedSection(e.target.value);
   };
 
   const sortedLeaderboard = [...leaderboard].sort((a, b) => {
@@ -148,7 +152,7 @@ const LeaderboardUser = () => {
 
     return sortConfig.direction === "asc" ? aValue - bValue : bValue - aValue;
   });
-  // Ensure users with no rank are at the bottom
+
   const filteredLeaderboard = sortedLeaderboard
     .filter((user) => !ADMIN_EMAILS.includes(user.email)) // Exclude admin emails
     .filter((user) => {
@@ -160,8 +164,22 @@ const LeaderboardUser = () => {
         user.department.toLowerCase().includes(query)
       );
     })
-    .sort((a, b) => (a.rank ? 0 : 1) - (b.rank ? 0 : 1)) // Push users with no rank to the bottom
-    .slice(range.start - 1, range.end);
+    .filter((user) => {
+      if (selectedDepartment && selectedSection) {
+        return (
+          user.department === selectedDepartment &&
+          user.section === selectedSection
+        );
+      }
+      if (selectedDepartment) {
+        return user.department === selectedDepartment;
+      }
+      if (selectedSection) {
+        return user.section === selectedSection;
+      }
+      return true;
+    })
+    .sort((a, b) => (a.rank ? 0 : 1) - (b.rank ? 0 : 1)); // Push users with no rank to the bottom
 
   const getSortArrow = (key) => {
     if (sortConfig.key === key) {
@@ -182,15 +200,37 @@ const LeaderboardUser = () => {
           className="p-2 rounded-lg bg-[#2a2a2a] text-white border border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-auto"
         />
         <select
-          onChange={handleRangeChange}
+          onChange={handleDepartmentChange}
           className="p-2 rounded-lg bg-[#2a2a2a] text-white border border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-auto"
         >
-          {Array.from({ length: 10 }, (_, i) => (
-            <option key={i} value={`${i * 50 + 1}-${(i + 1) * 50}`}>
-              {i * 50 + 1}-{(i + 1) * 50}
-            </option>
-          ))}
+          <option value="">Select Department</option>
+          {[...new Set(leaderboard.map((user) => user.department))].map(
+            (department) => (
+              <option key={department} value={department}>
+                {department}
+              </option>
+            )
+          )}
         </select>
+        <select
+          onChange={handleSectionChange}
+          className="p-2 rounded-lg bg-[#2a2a2a] text-white border border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-auto"
+        >
+          <option value="">Select Section</option>
+          {[...new Set(leaderboard.map((user) => user.section))].map(
+            (section) => (
+              <option key={section} value={section}>
+                {section}
+              </option>
+            )
+          )}
+        </select>
+        <button
+          onClick={() => handleSort("departmentAndSection")}
+          className="p-2 rounded-lg bg-blue-600 text-white border border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-auto"
+        >
+          Sort by Department & Section
+        </button>
       </div>
 
       <div className="overflow-x-auto">
@@ -202,7 +242,8 @@ const LeaderboardUser = () => {
           <table className="w-full border-collapse border border-blue-600 shadow-lg rounded-lg">
             <thead className="bg-[#333333] text-blue-500">
               <tr>
-                {[{ label: "Rank", key: "rank" },
+                {[
+                  { label: "Rank", key: "rank" },
                   { label: "Name", key: "name" },
                   { label: "Email", key: "email" },
                   { label: "Roll No", key: "rollno" },
@@ -216,7 +257,6 @@ const LeaderboardUser = () => {
                   { label: "HackerRank", key: "hackerrankScore" },
                   { label: "GeeksForGeeks", key: "gfgScore" },
                   { label: "Year", key: "graduationYear" },
-                  { label: "Department & Section", key: "departmentAndSection" }
                 ].map(({ label, key }) => (
                   <th
                     key={key}
@@ -266,8 +306,6 @@ const LeaderboardUser = () => {
                   <td className="border border-blue-600 px-4 py-2">
                     {user.totalScore}
                   </td>
-
-                  {/* ✅ FIX: Render platform scores correctly */}
                   <td className="border border-blue-600 px-4 py-2">
                     {user.platforms?.leetcode?.score ?? "-"}
                   </td>
