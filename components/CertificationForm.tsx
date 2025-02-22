@@ -43,7 +43,8 @@ const CertificationForm: React.FC<CertificationFormProps> = ({
     setLoading(true);
     setSuccess("");
     setError("");
-
+    const newCertification = { userId, name, issuer, date };
+    onAdd(newCertification);
     userId = session?.user?.email || "";
     const formData = new FormData();
     formData.append("userId", userId);
@@ -58,12 +59,15 @@ const CertificationForm: React.FC<CertificationFormProps> = ({
       });
 
       setSuccess("Certification added successfully!");
-      setName("");
-      setIssuer("");
-      setDate("");
-      setDescription("");
-      setImage(null);
-      setPreview(null);
+      setTimeout(() => {
+        setSuccess("");
+        setName("");
+        setIssuer("");
+        setDate("");
+        setDescription("");
+        setImage(null);
+        setPreview(null);
+      }, 3000);
     } catch (err: any) {
       setError(err.response?.data?.message || "An error occurred.");
     } finally {
@@ -85,7 +89,6 @@ const CertificationForm: React.FC<CertificationFormProps> = ({
             value={name}
             onChange={(e) => setName(e.target.value)}
             isRequired
-            variant="underlined"
           />
         </div>
         <div className="py-2 text-white">
@@ -99,12 +102,10 @@ const CertificationForm: React.FC<CertificationFormProps> = ({
             value={issuer}
             onChange={(e) => setIssuer(e.target.value)}
             isRequired
-            variant="underlined"
           />
         </div>
         <div className="py-2">
           <DatePicker
-            variant="underlined"
             label="Date of Issue"
             onChange={(date) => setDate(date?.toString() || "")}
             isRequired
@@ -116,7 +117,7 @@ const CertificationForm: React.FC<CertificationFormProps> = ({
         </div>
         <div className="py-2">
           <label className="text-white block mb-2">
-            Upload Certificate Image
+            Upload Certificate Image (jpg or png under 1MB only)
           </label>
           <input
             type="file"

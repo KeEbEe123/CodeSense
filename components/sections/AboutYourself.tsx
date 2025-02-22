@@ -8,11 +8,35 @@ import { useSession } from "next-auth/react";
 import { Switch } from "@heroui/switch";
 import { Tooltip } from "@heroui/react";
 import { Card, CardBody } from "@nextui-org/react"; // Card component for displaying entries
+import Image from "next/image";
+import { TbX } from "react-icons/tb";
 
 const AboutYourself = ({ onSuccess }: { onSuccess: () => void }) => {
   const { data: session } = useSession();
   const userid = session?.user?.email;
+  const handleDeleteCertification = async (name: string, issuer: string) => {
+    try {
+      const response = await fetch("/api/removeCertification", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: userid, name, issuer }),
+      });
 
+      const data = await response.json();
+      if (response.ok) {
+        alert("Certification deleted successfully!");
+        // Optionally update state to remove the certification from UI
+        setCertifications((prev) =>
+          prev.filter((cert) => cert.name !== name || cert.issuer !== issuer)
+        );
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error("Error deleting certification:", error);
+      alert("Failed to delete certification.");
+    }
+  };
   // States to track "None" toggle and added entries
   const [noneToggled, setNoneToggled] = useState({
     // skills: false,
@@ -51,6 +75,10 @@ const AboutYourself = ({ onSuccess }: { onSuccess: () => void }) => {
       <div className="w-full md:w-1/2 flex flex-col space-y-6 pr-6 ml-2 md:ml-4 lg:ml-10">
         {/* Certifications Section */}
         <div>
+          <p className="my-2 text-gray-600">
+            Certifications and Internships can be added or removed later from
+            your profile
+          </p>
           <label className="flex items-center space-x-2">
             <p>Add Certifications</p>
             <Tooltip content="Toggle this if you have none">
@@ -68,7 +96,6 @@ const AboutYourself = ({ onSuccess }: { onSuccess: () => void }) => {
               </Switch>
             </Tooltip>
           </label>
-
           {/* Smooth transition for forms */}
           <motion.div
             initial={false}
@@ -129,12 +156,14 @@ const AboutYourself = ({ onSuccess }: { onSuccess: () => void }) => {
         </div>
 
         {/* Navigation Button */}
-        <button
-          onClick={handleNext}
-          className="mt-6 px-4 py-2 bg-green-500 font-pop font-bold hover:bg-green-600 text-white rounded"
-        >
-          Save and Continue
-        </button>
+        <Tooltip content="add atleast one certification or internship to continue, or toggle the switch if you have none">
+          <button
+            onClick={handleNext}
+            className="mt-6 px-4 py-2 bg-green-500 font-pop font-bold hover:bg-green-600 text-white rounded"
+          >
+            Save and Continue
+          </button>
+        </Tooltip>
       </div>
 
       {/* Right Pane: Display Entries */}
@@ -150,12 +179,19 @@ const AboutYourself = ({ onSuccess }: { onSuccess: () => void }) => {
                   key={index}
                 >
                   <CardBody className="text-offwhite font-pop">
-                    <h3 className="text-2xl font-semibold mb-2">{cert.name}</h3>
-                    <p className="text-sm text-gray-600">{cert.description}</p>
-                    <p className="text-sm text-gray-600">
+                    <button
+                      onClick={() =>
+                        handleDeleteCertification(cert.name, cert.issuer)
+                      }
+                    >
+                      <TbX className="text-red-600 text-3xl bg-red-600/70 rounded-full p-1 hover:cursor-pointer" />
+                    </button>
+                    <h3 className="text-lg font-semibold mb-2">{cert.name}</h3>
+                    <p className="text-xs text-gray-600">{cert.description}</p>
+                    <p className="text-xs text-gray-600">
                       Issued by: {cert.issuer}
                     </p>
-                    <p className="text-sm text-gray-600">Date: {cert.date}</p>
+                    <p className="text-xs text-gray-600">Date: {cert.date}</p>
                   </CardBody>
                 </Card>
               ))}
@@ -174,16 +210,14 @@ const AboutYourself = ({ onSuccess }: { onSuccess: () => void }) => {
                   key={index}
                 >
                   <CardBody className="text-offwhite font-pop">
-                    <h3 className="text-2xl font-semibold mb-2">
-                      {inte.title}
-                    </h3>
-                    <p className="text-sm text-gray-600">
+                    <h3 className="text-lg font-semibold mb-2">{inte.title}</h3>
+                    <p className="text-xs text-gray-600">
                       Company: {inte.company}
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-xs text-gray-600">
                       Start Date: {inte.startDate}
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-xs text-gray-600">
                       End Date: {inte.endDate}
                     </p>
                   </CardBody>

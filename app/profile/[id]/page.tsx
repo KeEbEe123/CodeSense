@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Tabs, Tab, Card, CardBody } from "@heroui/react";
 import { useSession } from "next-auth/react";
-import { Image, Button } from "@heroui/react";
+import Image from "next/image";
 import axios from "axios";
 import FriendDetails from "@/components/FriendDetails";
 import CircleChartCard from "@/components/CircleChartCard";
@@ -103,7 +103,7 @@ const Profile = ({ params }: { params: { id: string } }) => {
             aria-label="Profile Details"
             color={"danger"}
             variant={"light"}
-            isVertical
+            isVertical={window.innerWidth < 400}
           >
             <Tab key="overview" title="Overview">
               <div className="w-full mb-4 hidden lg:block">
@@ -161,28 +161,41 @@ const Profile = ({ params }: { params: { id: string } }) => {
             </Tab>
 
             <Tab key="certifications" title="Certifications">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {Array.isArray(user.certifications) &&
                 user.certifications.length > 0 ? (
                   user.certifications.map((certification, index) => (
                     <Card
-                      className="pb-2 pr-14 bg-gradient-to-bl from-gray-800 to-background w-full "
                       key={index}
+                      className="group relative pb-2 pr-14 bg-gradient-to-bl from-gray-800 to-background w-full lg:pr-28 overflow-hidden min-w-48"
                     >
-                      <CardBody className="text-offwhite font-pop mb-2">
-                        <h3 className="text-2xl font-semibold ">
-                          {certification.name}
-                        </h3>
-                        <p className="text-sm text-gray-600">
-                          {certification.description}
-                        </p>
-                        <p className="text-sm text-gray-400">
-                          Issued by: {certification.issuer}
-                        </p>
-                        <p className="text-sm text-gray-400">
-                          Date: {certification.date}
-                        </p>
-                      </CardBody>
+                      <div className="flex flex-col">
+                        {/* Image */}
+                        <div className="mb-60">
+                          <Image
+                            src={certification.imageUrl}
+                            alt={certification.name}
+                            className="w-full h-40 object-cover rounded"
+                            fill={true}
+                          />
+                        </div>
+
+                        {/* CardBody hidden by default and shown on hover */}
+                        <CardBody className="absolute inset-0 bg-gray-900 bg-opacity-90 p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center text-offwhite font-pop">
+                          <h3 className="text-md sm:text-xl font-semibold mb-2">
+                            {certification.name}
+                          </h3>
+                          <p className="text-xs sm:text-sm text-gray-300">
+                            {certification.description}
+                          </p>
+                          <p className="text-xs sm:text-sm text-gray-400">
+                            Issued by: {certification.issuer}
+                          </p>
+                          <p className="text-xs sm:text-sm text-gray-400">
+                            Date: {certification.date}
+                          </p>
+                        </CardBody>
+                      </div>
                     </Card>
                   ))
                 ) : (
