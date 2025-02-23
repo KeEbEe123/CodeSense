@@ -63,6 +63,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head>
         <ColorSchemeScript />
       </head>
+      <script type="module"></script>
+
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${koulen.variable} ${poppins.variable} antialiased bg-background`}
       >

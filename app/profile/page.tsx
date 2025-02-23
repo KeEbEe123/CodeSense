@@ -42,6 +42,8 @@ import { Skeleton } from "@nextui-org/react";
 import GFGStatsNP from "@/components/GFGStatsNP";
 import GitHubCalendar from "react-github-calendar";
 import Image from "next/image";
+import { infinity } from "ldrs";
+import Loader from "@/components/Loader";
 
 const ProfilePage = () => {
   const { status, data: session } = useSession();
@@ -60,7 +62,7 @@ const ProfilePage = () => {
   const [isEditCertificateOpen, setEditCertificateOpen] = useState(false);
   const [selectedCertification, setSelectedCertification] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-
+  infinity.register("l-infinity");
   const handleDeleteCertification = async (name: string, issuer: string) => {
     try {
       const response = await fetch("/api/removeCertification", {
@@ -166,17 +168,8 @@ const ProfilePage = () => {
 
   if (loading) {
     return (
-      <div className="w-full h-full flex items-center gap-3 p-40 pb-20">
-        <div>
-          <Skeleton className="bg-background flex rounded-full w-40 h-40" />
-          <Skeleton className="bg-background flex rounded-lg w-40 h-10 mt-8" />
-          <Skeleton className="bg-background flex rounded-lg w-40 h-10 mt-8" />
-          <Skeleton className="bg-background flex rounded-lg w-40 h-20 mt-8" />
-        </div>
-        <div className="w-full flex flex-col gap-2 ml-20">
-          <Skeleton animated className="bg-background h-10 w-full rounded-lg" />
-          <Skeleton animated className="bg-background h-56 w-full rounded-lg" />
-        </div>
+      <div className="flex justify-center items-center h-screen">
+        <Loader />
       </div>
     );
   }

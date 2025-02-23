@@ -10,6 +10,7 @@ import CircleChartCard from "@/components/CircleChartCard";
 import FriendsPage from "@/components/FriendsPage";
 import { TransitionLink } from "@/components/TransitionLink";
 import GitHubCalendar from "react-github-calendar";
+import Loader from "@/components/Loader";
 
 const Profile = ({ params }: { params: { id: string } }) => {
   const [user, setUser] = useState<any>(null);
@@ -35,7 +36,11 @@ const Profile = ({ params }: { params: { id: string } }) => {
   }, [params.id]);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader />
+      </div>
+    );
   }
 
   if (!user) {
