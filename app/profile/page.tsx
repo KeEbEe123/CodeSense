@@ -42,7 +42,7 @@ import { Skeleton } from "@nextui-org/react";
 import GFGStatsNP from "@/components/GFGStatsNP";
 import GitHubCalendar from "react-github-calendar";
 import Image from "next/image";
-import { infinity } from "ldrs";
+
 import Loader from "@/components/Loader";
 
 const ProfilePage = () => {
@@ -62,7 +62,7 @@ const ProfilePage = () => {
   const [isEditCertificateOpen, setEditCertificateOpen] = useState(false);
   const [selectedCertification, setSelectedCertification] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  infinity.register("l-infinity");
+
   const handleDeleteCertification = async (name: string, issuer: string) => {
     try {
       const response = await fetch("/api/removeCertification", {
