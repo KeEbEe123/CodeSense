@@ -34,7 +34,10 @@ export async function GET() {
 
 export async function POST(request) {
   const session = await getServerSession(authOptions);
+  const ip =
+    request.headers.get("x-forwarded-for") || request.ip || "Unknown IP";
 
+  console.log(`Incoming request from IP: ${ip}`);
   // Check if user is signed in
   if (!session || !session.user) {
     return NextResponse.json(
