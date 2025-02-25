@@ -34,20 +34,32 @@ export async function GET() {
 
 export async function POST(request) {
   const session = await getServerSession(authOptions);
-  const ip =
-    request.headers.get("x-forwarded-for") || request.ip || "Unknown IP";
+  let ip =
+    request.headers.get("x-forwarded-for") ||
+    request.headers.get("x-real-ip") ||
+    request.ip ||
+    "Unknown IP";
+
+  // If multiple IPs exist, get the first one
+  if (ip.includes(",")) {
+    ip = ip.split(",")[0].trim();
+  }
 
   console.log(`Incoming request from IP: ${ip}`);
-  // Check if user is signed in
+
+  // Authentication and authorization checks
   if (!session || !session.user) {
+    console.warn(`Unauthorized access attempt from IP: ${ip}`);
     return NextResponse.json(
       { message: "Unauthorized: You must be signed in" },
       { status: 401 }
     );
   }
 
-  // Check if user is an admin
   if (!ADMIN_EMAILS.includes(session.user.email)) {
+    console.warn(
+      `Forbidden access attempt by ${session.user.email} from IP: ${ip}`
+    );
     return NextResponse.json(
       { message: "Forbidden: You don't have permission to add courses" },
       { status: 403 }
