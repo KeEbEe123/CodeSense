@@ -60,7 +60,7 @@ export async function POST(request) {
       `Forbidden access attempt by ${session.user.email} from IP: ${ip}`
     );
     return NextResponse.json(
-      { message: "Forbidden: You don't have permission to add courses" },
+      { message: "Forbidden: You don't have permission to add opportunities" },
       { status: 403 }
     );
   }
