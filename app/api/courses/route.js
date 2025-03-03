@@ -4,19 +4,7 @@ import { authOptions } from "../auth/[...nextauth]/route";
 import connectMongoDB from "@/lib/mongodb";
 import Course from "@/models/Course";
 
-const ADMIN_EMAILS = [
-  "keertan.k@gmail.com",
-  "siddhartht4206@gmail.com",
-  "23r21a12b3@mlrit.ac.in",
-  "23r21a1285@mlrit.ac.in",
-  "nv.rajasekhar@gmail.com",
-  "rajasekhar.nv@gmail.com",
-  "hodds@mlrinstitutions.ac.in",
-  "hodaiml@mlrinstitutions.ac.in",
-  "hodit@mlrinstitutions.ac.in",
-  "hodcse@mlrinstitutions.ac.in",
-  "pradeep13@mlrinstitutions.ac.in",
-];
+const ADMIN_EMAILS = process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(",") || [];
 
 export async function GET() {
   await connectMongoDB();
