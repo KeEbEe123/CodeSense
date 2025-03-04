@@ -13,10 +13,7 @@ export async function GET() {
     return NextResponse.json(courses);
   } catch (error) {
     console.error("Error fetching courses:", error);
-    return NextResponse.json(
-      { message: "Error fetching data" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Error fetching" }, { status: 500 });
   }
 }
 
