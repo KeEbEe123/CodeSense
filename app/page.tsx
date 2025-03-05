@@ -53,9 +53,9 @@ export default function Home() {
   return (
     <div className="relative flex justify-center items-center h-screen overflow-hidden">
       {/* Background Spline Scene */}
-      <div className="absolute inset-0 z-0 hidden lg:block md:block">
+      {/* <div className="absolute inset-0 z-0 hidden lg:block md:block">
         <Spline scene="https://prod.spline.design/QDYX7wgFfWfEx-Ix/scene.splinecode" />
-      </div>
+      </div> */}
     </div>
   );
 }
