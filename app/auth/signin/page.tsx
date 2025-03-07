@@ -39,10 +39,10 @@ export default function SignInPage() {
     <div className="relative flex justify-center items-center h-screen overflow-hidden">
       {/* Background Spline Scene */}
       <div className="absolute inset-0 z-0 hidden lg:block md:block">
-        <Spline scene="https://prod.spline.design/NBRAqAmjs0aDCXzp/scene.splinecode" />
+        {/* <Spline scene="https://prod.spline.design/NBRAqAmjs0aDCXzp/scene.splinecode" /> */}
       </div>
       <div className="absolute inset-0 z-0 lg:hidden md:hidden ml-4">
-        <Spline scene="https://prod.spline.design/o8IvYCTEj1eis0xM/scene.splinecode" />
+        {/* <Spline scene="https://prod.spline.design/o8IvYCTEj1eis0xM/scene.splinecode" /> */}
       </div>
 
       {/* Overlay Content */}
