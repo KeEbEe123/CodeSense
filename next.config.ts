@@ -17,6 +17,11 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true, // This disables linting during build
   },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb', // or '20mb', depending on what you need
+    },
+  },
 };
 
 export default nextConfig;
