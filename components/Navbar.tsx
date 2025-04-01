@@ -83,6 +83,12 @@ const Navbar: React.FC = () => {
           </button>
         </TransitionLink>
 
+        <TransitionLink href="/year">
+          <button className="relative text-xl font-koulen text-primary hover:text-offwhite transition-all duration-300 before:content-[''] before:absolute before:left-0 before:top-[30px] before:w-0 before:h-[3px] before:bg-pink-600 before:transition-all before:duration-300 hover:before:w-[100%]">
+            Year-Wise Leaderboard
+          </button>
+        </TransitionLink>
+
       </div>
 
       <div className="flex space-x-4">
