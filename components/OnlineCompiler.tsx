@@ -114,6 +114,7 @@ const Compiler = () => {
       <pre className="mt-4 p-2 bg-gray-800 text-white rounded w-full min-h-[100px]">
         {output || 'Output will appear here'}
       </pre>
+
     </div>
   );
 };
