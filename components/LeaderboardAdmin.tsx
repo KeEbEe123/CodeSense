@@ -187,6 +187,12 @@ const Leaderboard = () => {
         >
           Sort by Department & Section
         </button>
+        <button
+          onClick={() => handleSort("graduationYear")}
+          className="p-2 rounded-lg bg-blue-600 text-white border border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-auto"
+        >
+          Sort by Year
+        </button>
       </div>
 
       <div className="mb-4 text-right text-gray-500">
@@ -241,7 +247,7 @@ const Leaderboard = () => {
                       : user.rank === 2
                       ? "bg-gray-400/70"
                       : user.rank === 3
-                      ? "bg-pink-500/70"
+                      ? "bg-yellow-800/70"
                       : user.email === userEmail
                       ? "bg-pink-600/50"
                       : ""
