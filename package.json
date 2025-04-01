@@ -1,5 +1,5 @@
 {
-  "name": "eventos",
+  "name": "codesense",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -11,6 +11,10 @@
   "dependencies": {
     "@ag-grid-community/core": "^32.3.3",
     "@ag-grid-community/react": "^32.3.3",
+    "@codemirror/lang-cpp": "^6.0.2",
+    "@codemirror/lang-java": "^6.0.1",
+    "@codemirror/lang-javascript": "^6.2.3",
+    "@codemirror/lang-python": "^6.1.7",
     "@heroui/react": "^2.6.14",
     "@iconify/react": "^5.2.0",
     "@mantine/core": "^7.16.2",
@@ -20,8 +24,10 @@
     "@splinetool/react-spline": "^4.0.0",
     "@swup/parallel-plugin": "^0.4.0",
     "@swup/preload-plugin": "^3.2.11",
+    "@uiw/codemirror-theme-dracula": "^4.23.10",
+    "@uiw/react-codemirror": "^4.23.10",
     "autoprefixer": "^10.4.20",
-    "axios": "^1.7.9",
+    "axios": "^1.8.4",
     "bootstrap-icons": "^1.11.3",
     "cheerio": "^1.0.0",
     "file-saver": "^2.0.5",

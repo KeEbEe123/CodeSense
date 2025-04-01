@@ -1,139 +1,121 @@
-"use client";
-import React, { useState } from "react";
-import dynamic from "next/dynamic";
-import axios from "axios";
+'use client';
 
-// Dynamically import Monaco Editor
-const Editor = dynamic(() => import("monaco-editor"), { ssr: false });
+import React, { useState } from 'react';
+import CodeMirror from '@uiw/react-codemirror';
+import { dracula } from '@uiw/codemirror-theme-dracula';
+import { cpp } from '@codemirror/lang-cpp';
+import { python } from '@codemirror/lang-python';
+import { javascript } from '@codemirror/lang-javascript';
+import { java } from '@codemirror/lang-java';
+import axios from 'axios';
 
-const App = () => {
-  const [code, setCode] = useState("// Write your code here");
-  const [language, setLanguage] = useState("javascript");
-  const [output, setOutput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+const Compiler = () => {
+  const [code, setCode] = useState('');
+  const [language, setLanguage] = useState('54'); // Default: C++
+  const [output, setOutput] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const languageOptions = [
-    { id: 63, name: "JavaScript" },
-    { id: 71, name: "Python" },
-    { id: 50, name: "C++" },
-    { id: 62, name: "Java" },
-  ];
+  // Map of language IDs to names & syntax highlighters
+  const languages = {
+    '54': { name: 'C++', mode: cpp() },
+    '50': { name: 'C', mode: cpp() },
+    '62': { name: 'Java', mode: java() },
+    '71': { name: 'Python', mode: python() },
+    '63': { name: 'JavaScript', mode: javascript() }
+  };
 
-  const handleRunCode = async () => {
-    setIsLoading(true);
-    setOutput("");
+  const NEXT_RAPIDAPI_KEY = process.env.NEXT_PUBLIC_RAPIDAPI_KEY; // Fixed here
 
-    const selectedLanguage = languageOptions.find(
-      (lang) => lang.name === language
-    );
-
-    if (!selectedLanguage) {
-      setOutput("Language not supported");
-      setIsLoading(false);
-      return;
-    }
-
+  const executeCode = async () => {
+    setLoading(true);
+    setOutput(''); // Clear output before executing new code
     try {
       const response = await axios.post(
-        "https://judge0-ce.p.rapidapi.com/submissions",
+        'https://judge0-ce.p.rapidapi.com/submissions',
         {
           source_code: code,
-          language_id: selectedLanguage.id,
-          stdin: "",
+          language_id: language,
+          stdin: '', // Allow users to send input if needed
         },
         {
           headers: {
-            "Content-Type": "application/json",
-            "X-RapidAPI-Key": "YOUR_RAPIDAPI_KEY",
-            "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
+            'X-RapidAPI-Key': NEXT_RAPIDAPI_KEY,
+            'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com',
           },
         }
       );
 
-      const { token } = response.data;
+      const token = response.data.token;
 
-      let result;
-      do {
-        result = await axios.get(
-          `https://judge0-ce.p.rapidapi.com/submissions/${token}?base64_encoded=false`,
+      // Poll for the result every 3 seconds
+      const pollResult = setInterval(async () => {
+        const result = await axios.get(
+          `https://judge0-ce.p.rapidapi.com/submissions/${token}`,
           {
             headers: {
-              "X-RapidAPI-Key": "YOUR_RAPIDAPI_KEY",
-              "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
+              'X-RapidAPI-Key': NEXT_RAPIDAPI_KEY,
+              'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com',
             },
           }
         );
-      } while (result.data.status.id <= 2);
 
-      setOutput(
-        result.data.stdout || result.data.stderr || "No output returned."
-      );
+        if (result.data.status.description === 'Accepted') {
+          setOutput(result.data.stdout || 'No output');
+          setLoading(false);
+          clearInterval(pollResult); // Stop polling once the result is ready
+        } else if (result.data.status.description === 'Time limit exceeded' || result.data.status.description === 'Memory limit exceeded') {
+          setOutput('Code execution exceeded limits');
+          setLoading(false);
+          clearInterval(pollResult);
+        } else if (result.data.status.description === 'Compilation Error' || result.data.status.description === 'Runtime Error') {
+          setOutput(result.data.stderr || 'Error executing code');
+          setLoading(false);
+          clearInterval(pollResult);
+        }
+      }, 3000); // Poll every 3 seconds
+
     } catch (error) {
-      setOutput("Error executing code: " + error.message);
-    } finally {
-      setIsLoading(false);
+      console.error(error);
+      setOutput('Error executing code.');
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
-      <h1>Code Editor with Judge0</h1>
+    <div className="flex flex-col items-center w-full p-4">
+      <h1 className="text-2xl font-bold mb-4">Online Compiler</h1>
+      <select
+        className="mb-4 p-2 border rounded"
+        onChange={(e) => setLanguage(e.target.value)}
+        value={language}
+      >
+        {Object.entries(languages).map(([id, lang]) => (
+          <option key={id} value={id}>{lang.name}</option>
+        ))}
+      </select>
 
-      <div style={{ marginBottom: "10px" }}>
-        <label htmlFor="language">Select Language: </label>
-        <select
-          id="language"
-          value={language}
-          onChange={(e) => setLanguage(e.target.value)}
-        >
-          {languageOptions.map((lang) => (
-            <option key={lang.id} value={lang.name}>
-              {lang.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <Editor
-        height="400px"
-        language={language.toLowerCase()}
+      <CodeMirror
         value={code}
+        height="250px"
+        theme={dracula}
+        extensions={[languages[language]?.mode]}
         onChange={(value) => setCode(value)}
-        theme="vs-dark"
+        className="w-full border rounded"
       />
 
-      <div style={{ marginTop: "10px" }}>
-        <button
-          onClick={handleRunCode}
-          style={{
-            padding: "10px 20px",
-            fontSize: "16px",
-            cursor: "pointer",
-            backgroundColor: "#4CAF50",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-          }}
-          disabled={isLoading}
-        >
-          {isLoading ? "Running..." : "Run Code"}
-        </button>
-      </div>
-
-      <div
-        style={{
-          marginTop: "20px",
-          padding: "10px",
-          backgroundColor: "#f4f4f4",
-          border: "1px solid #ddd",
-          borderRadius: "4px",
-        }}
+      <button
+        className="mt-4 p-2 bg-blue-500 text-white rounded"
+        onClick={executeCode}
+        disabled={loading}
       >
-        <h3>Output:</h3>
-        <pre>{output}</pre>
-      </div>
+        {loading ? 'Running...' : 'Run Code'}
+      </button>
+
+      <pre className="mt-4 p-2 bg-gray-800 text-white rounded w-full min-h-[100px]">
+        {output || 'Output will appear here'}
+      </pre>
     </div>
   );
 };
 
-export default App;
+export default Compiler;

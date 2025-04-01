@@ -1,9 +1,11 @@
 "use client";
-import CodeEditor from "@/components/CodeEditor";
 import React from "react";
+import OnlineCompiler from "@/components/OnlineCompiler"
 
 const page = () => {
-  return <div>s</div>;
+  return <div>
+    <OnlineCompiler/>
+  </div>;
 };
 
 export default page;
