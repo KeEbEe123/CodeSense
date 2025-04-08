@@ -12,6 +12,8 @@ type Change = {
 export default function WeeklyChangeDashboard() {
   const [changes, setChanges] = useState<Change[]>([]);
   const [loading, setLoading] = useState(false);
+  const [pushing, setPushing] = useState(false);
+  const [viewing, setViewing] = useState(false);
 
   const handleTrackChange = async () => {
     setLoading(true);
@@ -22,16 +24,50 @@ export default function WeeklyChangeDashboard() {
     setLoading(false);
   };
 
+  const handlePushChangesToUsers = async () => {
+    setPushing(true);
+    await fetch("/api/push-weekly-difference", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ changes }),
+    });
+    setPushing(false);
+  };
+
+  const handleViewStatsOnly = async () => {
+    setViewing(true);
+    const res = await fetch("/api/get-weekly-change");
+    const data = await res.json();
+    setChanges(data);
+    setViewing(false);
+  };
+
   return (
     <div className="p-6">
-      <button
-        onClick={handleTrackChange}
-        className="px-4 py-2 bg-blue-600 text-white rounded"
-      >
-        {loading ? "Tracking..." : "Track Weekly Change"}
-      </button>
+      <div className="flex gap-4 mb-6 flex-wrap">
+        <button
+          onClick={handleTrackChange}
+          className="px-4 py-2 bg-blue-600 text-white rounded"
+        >
+          {loading ? "Tracking..." : "Track Weekly Change"}
+        </button>
 
-      <div className="mt-6">
+        <button
+          onClick={handlePushChangesToUsers}
+          className="px-4 py-2 bg-green-600 text-white rounded"
+        >
+          {pushing ? "Pushing..." : "Push Changes to Users"}
+        </button>
+
+        <button
+          onClick={handleViewStatsOnly}
+          className="px-4 py-2 bg-gray-700 text-white rounded"
+        >
+          {viewing ? "Loading..." : "Display Current Weekly Stats"}
+        </button>
+      </div>
+
+      <div>
         <h2 className="text-xl font-semibold mb-4">User Score Changes</h2>
         <table className="w-full border text-left">
           <thead>
