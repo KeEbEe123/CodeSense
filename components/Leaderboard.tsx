@@ -1,29 +1,22 @@
 "use client";
-import React, { useState, useEffect } from "react";
+
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Skeleton } from "@nextui-org/react";
 
-const LeaderboardUser = () => {
-  interface User {
-    _id: string;
-    rank?: number;
-    name: string;
-    email: string;
-    rollno: string;
-    department: string;
-    section: string;
-    totalScore: number;
-    platforms: {
-      leetcode?: { score: number };
-      codechef?: { score: number };
-      codeforces?: { score: number };
-      github?: { score: number };
-      hackerrank?: { score: number };
-      geeksforgeeks?: { score: number };
-    };
-    graduationYear: string;
-  }
+const Leaderboard = () => {
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortConfig, setSortConfig] = useState([]);
+  const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [selectedSection, setSelectedSection] = useState("");
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const { status, data: session } = useSession();
+
+  const userEmail = session?.user?.email;
+  const router = useRouter();
   const ADMIN_EMAILS = [
     "keertan.k@gmail.com",
     "admin2@example.com",
@@ -36,39 +29,43 @@ const LeaderboardUser = () => {
     "hodcse@mlrinstitutions.ac.in",
     "pradeep13@mlrinstitutions.ac.in",
   ];
-  const [leaderboard, setLeaderboard] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedDepartment, setSelectedDepartment] = useState("");
-  const [selectedSection, setSelectedSection] = useState("");
+  
 
-  const [sortConfig, setSortConfig] = useState({
-    key: null,
-    direction: "asc",
-    secondaryKey: null, // To keep track of independent sorting
-  });
+  const fetchLeaderboard = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/leaderboard");
+      const data = await response.json();
 
-  const { status, data: session } = useSession();
-  const userEmail = session?.user?.email;
-  const router = useRouter();
+      if (Array.isArray(data)) {
+        const updatedData = data.map((user) => {
+          const latest =
+            user.dayChanges && user.dayChanges.length > 0
+              ? [...user.dayChanges]
+                  .sort(
+                    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+                  )[0]
+              : { change: 0, date: "" };
+          return {
+            ...user,
+            latestChange: latest.change,
+            changeDate: latest.date,
+          };
+        });
+
+        setLeaderboard(updatedData);
+        setLastUpdated(new Date().toLocaleString());
+      } else {
+        console.error("Unexpected data format:", data);
+      }
+    } catch (error) {
+      console.error("Error fetching leaderboard:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchLeaderboard = async () => {
-      try {
-        const response = await fetch("/api/leaderboard");
-        const data = await response.json();
-        if (Array.isArray(data)) {
-          setLeaderboard(data);
-        } else {
-          console.error("Unexpected data format:", data);
-        }
-      } catch (error) {
-        console.error("Error fetching leaderboard:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchLeaderboard();
   }, []);
 
@@ -81,22 +78,26 @@ const LeaderboardUser = () => {
   };
 
   const handleSort = (key) => {
-    let direction = "asc";
-
-    if (sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc";
-    }
-
-    setSortConfig((prevConfig) => {
-      if (key === "department" || key === "section") {
-        return {
-          key,
-          direction,
-          secondaryKey:
-            prevConfig.secondaryKey === key ? null : prevConfig.secondaryKey,
-        };
+    setSortConfig((prevSortConfig) => {
+      if (key === "departmentAndSection") {
+        return [
+          { key: "department", direction: "asc" },
+          { key: "section", direction: "asc" },
+        ];
       }
-      return { key, direction, secondaryKey: null };
+      const existingSort = prevSortConfig.find((config) => config.key === key);
+      if (existingSort) {
+        return prevSortConfig.map((config) =>
+          config.key === key
+            ? {
+                ...config,
+                direction: config.direction === "asc" ? "desc" : "asc",
+              }
+            : config
+        );
+      } else {
+        return [...prevSortConfig, { key, direction: "asc" }];
+      }
     });
   };
 
@@ -109,59 +110,26 @@ const LeaderboardUser = () => {
   };
 
   const sortedLeaderboard = [...leaderboard].sort((a, b) => {
-    if (!sortConfig.key) return 0;
-
-    const getValue = (user, key) => {
-      if (
-        [
-          "leetcodeScore",
-          "codechefScore",
-          "codeforcesScore",
-          "githubScore",
-          "hackerrankScore",
-          "gfgScore",
-        ].includes(key)
-      ) {
-        const platformKey = key.replace("Score", "");
-        return user.platforms[platformKey]?.score || 0;
-      }
-      return user[key];
-    };
-
-    if (sortConfig.key === "departmentAndSection") {
-      const departmentComparison = a.department.localeCompare(b.department);
-      if (departmentComparison !== 0) {
-        return sortConfig.direction === "asc"
-          ? departmentComparison
-          : -departmentComparison;
-      }
-      const sectionComparison = a.section.localeCompare(b.section);
-      return sortConfig.direction === "asc"
-        ? sectionComparison
-        : -sectionComparison;
+    if (!a.rank && b.rank) return 1;
+    if (a.rank && !b.rank) return -1;
+    for (const { key, direction } of sortConfig) {
+      const aValue = key.split(".").reduce((obj, part) => obj?.[part], a) ?? 0;
+      const bValue = key.split(".").reduce((obj, part) => obj?.[part], b) ?? 0;
+      if (aValue < bValue) return direction === "asc" ? -1 : 1;
+      if (aValue > bValue) return direction === "asc" ? 1 : -1;
     }
-
-    const aValue = getValue(a, sortConfig.key);
-    const bValue = getValue(b, sortConfig.key);
-
-    if (typeof aValue === "string") {
-      return sortConfig.direction === "asc"
-        ? aValue.localeCompare(bValue)
-        : bValue.localeCompare(aValue);
-    }
-
-    return sortConfig.direction === "asc" ? aValue - bValue : bValue - aValue;
+    return 0;
   });
 
   const filteredLeaderboard = sortedLeaderboard
-    .filter((user) => !ADMIN_EMAILS.includes(user.email)) // Exclude admin emails
+    .filter((user) => !ADMIN_EMAILS.includes(user.email))
     .filter((user) => {
       const query = searchQuery.toLowerCase();
       return (
-        user.name.toLowerCase().includes(query) ||
-        user.email.toLowerCase().includes(query) ||
-        user.rollno.toLowerCase().includes(query) ||
-        user.department.toLowerCase().includes(query)
+        user.name?.toLowerCase().includes(query) ||
+        user.email?.toLowerCase().includes(query) ||
+        user.rollno?.toLowerCase().includes(query) ||
+        user.department?.toLowerCase().includes(query)
       );
     })
     .filter((user) => {
@@ -178,14 +146,15 @@ const LeaderboardUser = () => {
         return user.section === selectedSection;
       }
       return true;
-    })
-    .sort((a, b) => (a.rank ? 0 : 1) - (b.rank ? 0 : 1)); // Push users with no rank to the bottom
+    });
 
   const getSortArrow = (key) => {
-    if (sortConfig.key === key) {
-      return sortConfig.direction === "asc" ? "↑" : "↓";
-    }
-    return "";
+    const sortConfigItem = sortConfig.find((config) => config.key === key);
+    return sortConfigItem
+      ? sortConfigItem.direction === "asc"
+        ? "↑"
+        : "↓"
+      : "";
   };
 
   return (
@@ -231,6 +200,11 @@ const LeaderboardUser = () => {
         >
           Sort by Department & Section
         </button>
+
+      </div>
+
+      <div className="mb-4 text-right text-gray-500">
+        Entries: {filteredLeaderboard.length + 1}
       </div>
 
       <div className="overflow-x-auto">
@@ -250,13 +224,17 @@ const LeaderboardUser = () => {
                   { label: "Department", key: "department" },
                   { label: "Section", key: "section" },
                   { label: "Total Score", key: "totalScore" },
-                  { label: "LeetCode", key: "leetcodeScore" },
-                  { label: "CodeChef", key: "codechefScore" },
-                  { label: "CodeForces", key: "codeforcesScore" },
-                  { label: "GitHub", key: "githubScore" },
-                  { label: "HackerRank", key: "hackerrankScore" },
-                  { label: "GeeksForGeeks", key: "gfgScore" },
+                  { label: "LeetCode", key: "platforms.leetcode.score" },
+                  { label: "CodeChef", key: "platforms.codechef.score" },
+                  { label: "CodeForces", key: "platforms.codeforces.score" },
+                  { label: "GitHub", key: "platforms.github.score" },
+                  { label: "HackerRank", key: "platforms.hackerrank.score" },
+                  {
+                    label: "GeeksforGeeks",
+                    key: "platforms.geeksforgeeks.score",
+                  },
                   { label: "Year", key: "graduationYear" },
+                  { label: "Day Change", key: "latestChange" }, // 👈 NEW COLUMN
                 ].map(({ label, key }) => (
                   <th
                     key={key}
@@ -268,64 +246,47 @@ const LeaderboardUser = () => {
                 ))}
               </tr>
             </thead>
-            <tbody className="bg-[#2a2a2a] text-offwhite">
+            <tbody className="bg-[#2a2a2a] text-gray-50">
               {filteredLeaderboard.map((user) => (
-                <tr
-                  key={user._id}
-                  className={`hover:bg-[#3a3a3a] transition-all cursor-pointer ${
-                    user.rank === 1
-                      ? "bg-yellow-500/70"
-                      : user.rank === 2
-                      ? "bg-gray-400/70"
-                      : user.rank === 3
-                      ? "bg-yellow-800/70"
-                      : user.email === userEmail
-                      ? "bg-pink-600/50"
-                      : ""
-                  }`}
-                  onClick={() => handleRowClick(user._id)}
-                >
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.rank || "-"}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.name}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.email}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.rollno}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.department}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.section}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.totalScore}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.platforms?.leetcode?.score ?? "-"}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.platforms?.codechef?.score ?? "-"}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.platforms?.codeforces?.score ?? "-"}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.platforms?.github?.score ?? "-"}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.platforms?.hackerrank?.score ?? "-"}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.platforms?.geeksforgeeks?.score ?? "-"}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.graduationYear}
+               <tr
+               key={user._id}
+               className={`hover:bg-[#3a3a3a] transition-all cursor-pointer ${
+                 user.rank === 1
+                   ? "bg-yellow-500/70"
+                   : user.rank === 2
+                   ? "bg-gray-400/70"
+                   : user.rank === 3
+                   ? "bg-yellow-800/70"
+                   : user.email === userEmail
+                   ? "bg-pink-600/50"
+                   : ""
+               }`}
+               onClick={() => handleRowClick(user._id)}
+             >
+                  <td className="border border-blue-600 px-4 py-2">{user.rank ?? 0}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.name}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.email}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.rollno}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.department}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.section}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.totalScore ?? 0}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.platforms?.leetcode?.score ?? 0}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.platforms?.codechef?.score ?? 0}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.platforms?.codeforces?.score ?? 0}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.platforms?.github?.score ?? 0}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.platforms?.hackerrank?.score ?? 0}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.platforms?.geeksforgeeks?.score ?? 0}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.graduationYear || "-"}</td>
+                  <td className={`border border-blue-600 px-4 py-2 ${
+                    user.latestChange > 75
+                      ? "text-gray-400"
+                      : user.latestChange > 0
+                      ? "text-green-500"
+                      : user.latestChange < 0
+                      ? "text-red-500"
+                      : "text-gray-500"
+                  }`}>
+                    {user.latestChange > 75 ? "-" : user.latestChange}
                   </td>
                 </tr>
               ))}
@@ -337,4 +298,4 @@ const LeaderboardUser = () => {
   );
 };
 
-export default LeaderboardUser;
+export default Leaderboard;

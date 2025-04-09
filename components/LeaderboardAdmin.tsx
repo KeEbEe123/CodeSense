@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -28,14 +29,31 @@ const Leaderboard = () => {
     "hodcse@mlrinstitutions.ac.in",
     "pradeep13@mlrinstitutions.ac.in",
   ];
+  
 
   const fetchLeaderboard = async () => {
     setLoading(true);
     try {
       const response = await fetch("/api/leaderboard");
       const data = await response.json();
+
       if (Array.isArray(data)) {
-        setLeaderboard(data);
+        const updatedData = data.map((user) => {
+          const latest =
+            user.dayChanges && user.dayChanges.length > 0
+              ? [...user.dayChanges]
+                  .sort(
+                    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+                  )[0]
+              : { change: 0, date: "" };
+          return {
+            ...user,
+            latestChange: latest.change,
+            changeDate: latest.date,
+          };
+        });
+
+        setLeaderboard(updatedData);
         setLastUpdated(new Date().toLocaleString());
       } else {
         console.error("Unexpected data format:", data);
@@ -62,7 +80,10 @@ const Leaderboard = () => {
   const handleSort = (key) => {
     setSortConfig((prevSortConfig) => {
       if (key === "departmentAndSection") {
-        return [{ key: "department", direction: "asc" }, { key: "section", direction: "asc" }];
+        return [
+          { key: "department", direction: "asc" },
+          { key: "section", direction: "asc" },
+        ];
       }
       const existingSort = prevSortConfig.find((config) => config.key === key);
       if (existingSort) {
@@ -88,15 +109,12 @@ const Leaderboard = () => {
     setSelectedSection(e.target.value);
   };
 
-  // Sorting users: Move users with no rank to the bottom
   const sortedLeaderboard = [...leaderboard].sort((a, b) => {
-    if (!a.rank && b.rank) return 1; // No-rank users go to bottom
+    if (!a.rank && b.rank) return 1;
     if (a.rank && !b.rank) return -1;
     for (const { key, direction } of sortConfig) {
-      const aValue =
-        key.split(".").reduce((obj, keyPart) => obj[keyPart], a) ?? 0;
-      const bValue =
-        key.split(".").reduce((obj, keyPart) => obj[keyPart], b) ?? 0;
+      const aValue = key.split(".").reduce((obj, part) => obj?.[part], a) ?? 0;
+      const bValue = key.split(".").reduce((obj, part) => obj?.[part], b) ?? 0;
       if (aValue < bValue) return direction === "asc" ? -1 : 1;
       if (aValue > bValue) return direction === "asc" ? 1 : -1;
     }
@@ -108,10 +126,10 @@ const Leaderboard = () => {
     .filter((user) => {
       const query = searchQuery.toLowerCase();
       return (
-        user.name.toLowerCase().includes(query) ||
-        user.email.toLowerCase().includes(query) ||
-        user.rollno.toLowerCase().includes(query) ||
-        user.department.toLowerCase().includes(query)
+        user.name?.toLowerCase().includes(query) ||
+        user.email?.toLowerCase().includes(query) ||
+        user.rollno?.toLowerCase().includes(query) ||
+        user.department?.toLowerCase().includes(query)
       );
     })
     .filter((user) => {
@@ -141,11 +159,6 @@ const Leaderboard = () => {
 
   return (
     <div className="p-8 min-h-screen bg-[#1c1c1c] text-blue-400 font-pop">
-      {lastUpdated && (
-        <p className="text-right text-gray-500 text-sm mb-4">
-          Last Updated: {lastUpdated}
-        </p>
-      )}
       <h1 className="text-5xl font-bold text-center mb-6">Leaderboard</h1>
       <div className="mb-6 flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
         <input
@@ -187,12 +200,7 @@ const Leaderboard = () => {
         >
           Sort by Department & Section
         </button>
-        <button
-          onClick={() => handleSort("graduationYear")}
-          className="p-2 rounded-lg bg-blue-600 text-white border border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-auto"
-        >
-          Sort by Year
-        </button>
+
       </div>
 
       <div className="mb-4 text-right text-gray-500">
@@ -226,6 +234,7 @@ const Leaderboard = () => {
                     key: "platforms.geeksforgeeks.score",
                   },
                   { label: "Year", key: "graduationYear" },
+                  { label: "Day Change", key: "latestChange" }, // 👈 NEW COLUMN
                 ].map(({ label, key }) => (
                   <th
                     key={key}
@@ -237,64 +246,47 @@ const Leaderboard = () => {
                 ))}
               </tr>
             </thead>
-            <tbody className="bg-[#2a2a2a] text-blue-400">
+            <tbody className="bg-[#2a2a2a] text-gray-50">
               {filteredLeaderboard.map((user) => (
-                <tr
-                  key={user._id}
-                  className={`hover:bg-[#3a3a3a] transition-all cursor-pointer ${
-                    user.rank === 1
-                      ? "bg-yellow-500/70"
-                      : user.rank === 2
-                      ? "bg-gray-400/70"
-                      : user.rank === 3
-                      ? "bg-yellow-800/70"
-                      : user.email === userEmail
-                      ? "bg-pink-600/50"
-                      : ""
-                  }`}
-                  onClick={() => handleRowClick(user._id)}
-                >
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.rank ?? 0}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.name}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.email}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.rollno}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.department}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.section}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.totalScore ?? 0}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.platforms?.leetcode?.score ?? 0}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.platforms?.codechef?.score ?? 0}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.platforms?.codeforces?.score ?? 0}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.platforms?.github?.score ?? 0}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.platforms?.hackerrank?.score ?? 0}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.platforms?.geeksforgeeks?.score ?? 0}
-                  </td>
-                  <td className="border border-blue-600 px-4 py-2">
-                    {user.graduationYear || "-"}
+               <tr
+               key={user._id}
+               className={`hover:bg-[#3a3a3a] transition-all cursor-pointer ${
+                 user.rank === 1
+                   ? "bg-yellow-500/70"
+                   : user.rank === 2
+                   ? "bg-gray-400/70"
+                   : user.rank === 3
+                   ? "bg-yellow-800/70"
+                   : user.email === userEmail
+                   ? "bg-pink-600/50"
+                   : ""
+               }`}
+               onClick={() => handleRowClick(user._id)}
+             >
+                  <td className="border border-blue-600 px-4 py-2">{user.rank ?? 0}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.name}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.email}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.rollno}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.department}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.section}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.totalScore ?? 0}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.platforms?.leetcode?.score ?? 0}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.platforms?.codechef?.score ?? 0}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.platforms?.codeforces?.score ?? 0}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.platforms?.github?.score ?? 0}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.platforms?.hackerrank?.score ?? 0}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.platforms?.geeksforgeeks?.score ?? 0}</td>
+                  <td className="border border-blue-600 px-4 py-2">{user.graduationYear || "-"}</td>
+                  <td className={`border border-blue-600 px-4 py-2 ${
+                    user.latestChange > 75
+                      ? "text-gray-400"
+                      : user.latestChange > 0
+                      ? "text-green-500"
+                      : user.latestChange < 0
+                      ? "text-red-500"
+                      : "text-gray-500"
+                  }`}>
+                    {user.latestChange > 75 ? "-" : user.latestChange}
                   </td>
                 </tr>
               ))}
