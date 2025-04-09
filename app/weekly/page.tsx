@@ -1,6 +1,7 @@
 "use client"
 import LatestDayChanges from '@/components/LatestDayChanges';
 import TrackChanges from '@/components/TrackChanges'
+import WeeklyLeaderboard from '@/components/WeeklyLeaderboard';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import React, { useEffect } from 'react' 
@@ -33,7 +34,9 @@ const page = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
+      <TrackChanges/>
       <LatestDayChanges/>
+      <WeeklyLeaderboard/>
     </div>
 )
 }
