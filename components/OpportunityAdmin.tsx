@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Card, CardBody } from "@heroui/react";
-
 import {
   Modal,
   ModalContent,
@@ -12,12 +11,9 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
-  Checkbox,
-  Input,
-  Link,
 } from "@heroui/react";
+
 import OpportunityForm from "./OpportunityForm";
-import { isObjectIdOrHexString } from "mongoose";
 
 interface Opportunity {
   id: string;
@@ -30,6 +26,14 @@ interface Opportunity {
   formLink: string;
   departments: string[];
   duration: string;
+  applied: string[];
+}
+
+interface ApplicantDetails {
+  email: string;
+  name?: string;
+  department?: string;
+  year?: string;
 }
 
 const OpportunitiesAdmin = () => {
@@ -38,6 +42,9 @@ const OpportunitiesAdmin = () => {
     useState<Opportunity | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+  const [applicantDetails, setApplicantDetails] = useState<ApplicantDetails[]>([]);
+  const [sortType, setSortType] = useState<"year" | "department" | "none">("none");
 
   useEffect(() => {
     fetchOpportunities();
@@ -54,12 +61,60 @@ const OpportunitiesAdmin = () => {
 
   const handleEdit = (opportunity: Opportunity) => {
     setSelectedOpportunity(opportunity);
-    onOpen(); // This ensures the modal opens when editing
+    onOpen();
   };
 
   const handleAddNew = () => {
     setSelectedOpportunity(null);
-    onOpen(); // Opens the modal when adding a new opportunity
+    onOpen();
+  };
+
+  const extractYear = (email: string) => email.slice(0, 2);
+  const extractDepartment = (email: string) => email.slice(4, 8);
+
+  const fetchApplicantDetails = async (emails: string[]) => {
+    const details: ApplicantDetails[] = [];
+
+    await Promise.all(
+      emails.map(async (email) => {
+        try {
+          const response = await axios.get(`/api/getUserByEmail?email=${email}`);
+          const user = response.data.user;
+
+          details.push({
+            email,
+            name: user.name || "",
+            department: user.department || extractDepartment(email),
+            year: user.year || extractYear(email),
+          });
+        } catch (error) {
+          console.error(`Failed to fetch user for ${email}`, error);
+          details.push({
+            email,
+            name: "",
+            department: extractDepartment(email),
+            year: extractYear(email),
+          });
+        }
+      })
+    );
+
+    setApplicantDetails(details);
+  };
+
+  const handleViewApplicants = async (opp: Opportunity) => {
+    await fetchApplicantDetails(opp.applied || []);
+    setIsModalOpen(true);
+  };
+
+  const getSortedApplicants = () => {
+    let sorted = [...applicantDetails];
+    if (sortType === "year") {
+      sorted.sort((a, b) => (a.year || "").localeCompare(b.year || ""));
+    } else if (sortType === "department") {
+      sorted.sort((a, b) => (a.department || "").localeCompare(b.department || ""));
+    }
+    return sorted;
   };
 
   return (
@@ -75,17 +130,27 @@ const OpportunitiesAdmin = () => {
               <p>
                 <strong>Duration:</strong> {opp.duration}
               </p>
-              <Button onPress={() => handleEdit(opp)}>Edit</Button>
+              <div className="flex gap-2 mt-2">
+                <Button onPress={() => handleEdit(opp)}>Edit</Button>
+                <Button
+                  color="primary"
+                  onPress={() => handleViewApplicants(opp)}
+                >
+                  View Applicants
+                </Button>
+              </div>
             </CardBody>
           </Card>
         ))}
       </div>
+
       <Button
         className="fixed bottom-6 right-6 rounded-full p-4"
-        onPress={() => handleAddNew()}
+        onPress={handleAddNew}
       >
         +
       </Button>
+
       <Modal
         isOpen={isOpen}
         onOpenChange={onOpenChange}
@@ -113,6 +178,66 @@ const OpportunitiesAdmin = () => {
                 <Button color="success" variant="flat" onPress={onClose}>
                   Save
                 </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      <Modal
+        isOpen={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        backdrop="opaque"
+        className="bg-gray-900 text-white"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="text-xl font-semibold">
+                Applicants
+              </ModalHeader>
+              <ModalBody>
+                <div className="flex gap-4 mb-4">
+                  <Button
+                    size="sm"
+                    onPress={() => setSortType("year")}
+                    color={sortType === "year" ? "success" : "default"}
+                  >
+                    Sort by Year
+                  </Button>
+                  <Button
+                    size="sm"
+                    onPress={() => setSortType("department")}
+                    color={sortType === "department" ? "success" : "default"}
+                  >
+                    Sort by Dept.
+                  </Button>
+                </div>
+                <ul className="space-y-2">
+                  {getSortedApplicants().map((applicant, index) => (
+                    <li
+                      key={index}
+                      className="bg-gray-800 p-3 rounded-md shadow-md"
+                    >
+                      <div>
+                        <strong>Name:</strong> {applicant.name || "N/A"}
+                      </div>
+                      <div>
+                        <strong>Email:</strong> {applicant.email}
+                      </div>
+                      <div>
+                        <strong>Year:</strong> {applicant.year} &nbsp; | &nbsp;
+                        <strong>Dept:</strong> {applicant.department}
+                      </div>
+                    </li>
+                  ))}
+                  {getSortedApplicants().length === 0 && (
+                    <p className="text-sm text-gray-400">No applicants yet.</p>
+                  )}
+                </ul>
+              </ModalBody>
+              <ModalFooter>
+                <Button onPress={onClose}>Close</Button>
               </ModalFooter>
             </>
           )}
