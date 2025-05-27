@@ -234,6 +234,7 @@ async function refreshLeaderboard() {
     });
     for (let i = 0; i < updatedUsers.length; i++) {
       await User.findByIdAndUpdate(updatedUsers[i]._id, { rank: i + 1 });
+      //test
     }
   }, (users.length / batchSize) * updateInterval + 5000);
 }
